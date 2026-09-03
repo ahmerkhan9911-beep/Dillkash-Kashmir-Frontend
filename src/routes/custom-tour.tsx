@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Send } from "lucide-react";
+import { Check, Send, Car, Truck, Bus } from "lucide-react";
 import { destinations, whatsappLink } from "@/data/site";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
@@ -34,6 +34,7 @@ interface CustomForm {
   adults: number;
   kids: number;
   hotel: string;
+  transportPreference: string;
   destinations: string[];
   message: string;
 }
@@ -45,9 +46,16 @@ const initial: CustomForm = {
   adults: 2,
   kids: 0,
   hotel: "3 Star",
+  transportPreference: "Standard Car",
   destinations: [],
   message: "",
 };
+
+const TRANSPORT_OPTIONS = [
+  { value: "Standard Car", subtitle: "Up to 3 persons", icon: Car },
+  { value: "SUV / Prado", subtitle: "Best for off-roading", icon: Truck },
+  { value: "Grand Cabin / Hiace", subtitle: "For families/groups", icon: Bus },
+] as const;
 
 function CustomTourPage() {
   const [form, setForm] = useState<CustomForm>(initial);
@@ -218,6 +226,36 @@ function CustomTourPage() {
                         {h}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="mb-1.5 block text-sm font-semibold text-foreground">Transport Preference</span>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {TRANSPORT_OPTIONS.map((opt) => {
+                      const active = form.transportPreference === opt.value;
+                      const Icon = opt.icon;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setForm({ ...form, transportPreference: opt.value })}
+                          aria-pressed={active}
+                          className={cn(
+                            "relative flex flex-col items-center gap-1.5 rounded-xl border px-4 py-4 text-sm font-bold transition-all",
+                            active
+                              ? "border-[#059669] bg-[#059669] text-white shadow-md"
+                              : "border-border bg-background text-foreground hover:bg-secondary hover:border-[#059669]/40",
+                          )}
+                        >
+                          <Icon size={22} className={active ? "text-white" : "text-muted-foreground"} />
+                          <span>{opt.value}</span>
+                          <span className={cn("text-xs font-normal", active ? "text-white/80" : "text-muted-foreground")}>
+                            {opt.subtitle}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

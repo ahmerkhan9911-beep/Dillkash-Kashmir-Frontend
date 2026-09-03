@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-Cltr0gcK.js";import{n as t}from"./Match-TvrDzFK_.js";var n=e();function r(){return(0,n.jsx)(t,{})}export{r as component};

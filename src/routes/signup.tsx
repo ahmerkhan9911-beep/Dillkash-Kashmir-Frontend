@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff, UserPlus, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -71,8 +71,7 @@ function SignupPage() {
   };
 
   const inputCls = (field: string) =>
-    `w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring ${
-      fieldErrors[field] ? "border-destructive" : "border-input"
+    `w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring ${fieldErrors[field] ? "border-destructive" : "border-input"
     }`;
 
   if (success) {
@@ -81,7 +80,7 @@ function SignupPage() {
         <img src={heroImg} alt="" className="absolute inset-0 h-full w-full object-cover" aria-hidden />
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 to-black/50" />
         <Reveal>
-          <div className="relative mx-4 w-full max-w-md rounded-3xl border border-border bg-card/95 p-8 text-center shadow-lift backdrop-blur-md">
+          <div className="relative w-[calc(100%-2rem)] max-w-lg rounded-3xl border border-border bg-card/95 p-8 text-center shadow-lift backdrop-blur-md">
             <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
             </div>
@@ -99,7 +98,7 @@ function SignupPage() {
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 to-black/50" />
 
       <Reveal>
-        <div className="relative mx-4 w-full max-w-md rounded-3xl border border-border bg-card/95 p-8 shadow-lift backdrop-blur-md sm:mx-0">
+        <div className="relative w-[calc(100%-2rem)] max-w-lg rounded-3xl border border-border bg-card/95 p-8 shadow-lift backdrop-blur-md">
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground">
               <UserPlus size={26} />

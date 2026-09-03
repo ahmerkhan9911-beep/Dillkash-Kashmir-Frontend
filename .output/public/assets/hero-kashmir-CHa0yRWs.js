@@ -1,0 +1,1 @@
+var e=`/assets/hero-kashmir-DiMhvv-O.jpg`;export{e as t};

@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { resolveImageUrl } from "@/lib/resolveImage";
 import type { Tour, ItineraryDay } from "@/data/site";
 
 /* ---------- API Response Types ---------- */
@@ -34,45 +35,11 @@ interface PackageFromAPI {
 
 /* ---------- Helpers ---------- */
 
-/** Map image_url paths like "/assets/dest-keran.jpg" to static imports. */
-const assetMap: Record<string, () => Promise<{ default: string }>> = {
-  "/assets/dest-keran.jpg": () => import("@/assets/dest-keran.jpg"),
-  "/assets/dest-neelum-river.jpg": () => import("@/assets/dest-neelum-river.jpg"),
-  "/assets/dest-arang-kel.jpg": () => import("@/assets/dest-arang-kel.jpg"),
-  "/assets/dest-sharda.jpg": () => import("@/assets/dest-sharda.jpg"),
-  "/assets/dest-ratti-gali.jpg": () => import("@/assets/dest-ratti-gali.jpg"),
-  "/assets/dest-taobat.jpg": () => import("@/assets/dest-taobat.jpg"),
-  "/assets/dest-pir-chinasi.jpg": () => import("@/assets/dest-pir-chinasi.jpg"),
-  "/assets/dest-kutton.jpg": () => import("@/assets/dest-kutton.jpg"),
-  "/assets/dest-dhani.jpg": () => import("@/assets/dest-dhani.jpg"),
-  "/assets/dest-muzaffarabad.jpg": () => import("@/assets/dest-muzaffarabad.jpg"),
-  "/assets/hero-kashmir.jpg": () => import("@/assets/hero-kashmir.jpg"),
-  "/assets/video-thumb.jpg": () => import("@/assets/video-thumb.jpg"),
-};
-
-const resolvedAssetCache = new Map<string, string>();
-
-async function resolveImageUrl(url: string): Promise<string> {
-  if (!url || url.startsWith("http")) return url;
-  if (resolvedAssetCache.has(url)) return resolvedAssetCache.get(url)!;
-  const loader = assetMap[url];
-  if (loader) {
-    try {
-      const mod = await loader();
-      resolvedAssetCache.set(url, mod.default);
-      return mod.default;
-    } catch {
-      return url;
-    }
-  }
-  return url;
-}
-
 /** Convert API package to the Tour interface used by existing components. */
-async function toTour(pkg: PackageFromAPI): Promise<Tour> {
-  const image = await resolveImageUrl(pkg.image_url);
+function toTour(pkg: PackageFromAPI): Tour {
+  const image = resolveImageUrl(pkg.image_url);
   const galleryResolved = pkg.gallery
-    ? await Promise.all(pkg.gallery.map(resolveImageUrl))
+    ? pkg.gallery.map((img) => resolveImageUrl(img))
     : [image];
 
   const typeArr = (pkg.package_type || "")

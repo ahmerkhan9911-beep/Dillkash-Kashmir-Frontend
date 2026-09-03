@@ -135,6 +135,7 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isAdmin = pathname.startsWith("/admin");
+  const isAuth = pathname === "/login" || pathname === "/signup";
 
   return (
     <AuthProvider>
@@ -144,8 +145,8 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
         </main>
-        {!isAdmin && <Footer />}
-        {!isAdmin && <WhatsAppFloat />}
+        {!isAdmin && !isAuth && <Footer />}
+        {!isAdmin && !isAuth && <WhatsAppFloat />}
       </QueryClientProvider>
     </AuthProvider>
   );

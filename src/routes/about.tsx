@@ -1,4 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { getGuides } from "@/services/guides";
+import type { Guide } from "@/data/guides";
+import { resolveImageUrl } from "@/lib/resolveImage";
 import {
   ArrowRight,
   BadgeCheck,
@@ -6,6 +10,7 @@ import {
   Car,
   HeartHandshake,
   MapPin,
+  MessageCircle,
   ShieldCheck,
   Users,
 } from "lucide-react";
@@ -49,6 +54,12 @@ const trust = [
 ];
 
 function AboutPage() {
+  const [guides, setGuides] = useState<Guide[]>([]);
+
+  useEffect(() => {
+    getGuides().then(setGuides).catch(console.error);
+  }, []);
+
   return (
     <>
       {/* Hero */}
@@ -163,6 +174,64 @@ function AboutPage() {
               </div>
             </Reveal>
           ))}
+        </div>
+      </section>
+
+      {/* Tour Guides */}
+      <section className="bg-secondary/40 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <Reveal>
+            <SectionHeader
+              eyebrow="Our Team"
+              title="Meet Our Expert Tour Guides"
+              subtitle="Passionate locals who turn every Kashmir journey into an unforgettable story."
+            />
+          </Reveal>
+
+          {guides.length > 0 && (
+            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {guides.map((g, i) => (
+                <Reveal key={g.id} delay={i * 100}>
+                  <div className="group relative aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition-shadow duration-500 hover:shadow-xl">
+                    {/* Background Image */}
+                    <img
+                      src={resolveImageUrl(g.imageUrl)}
+                      alt={g.name}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+                    />
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-500 group-hover:from-black/95" />
+
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 flex w-full flex-col justify-end p-6">
+                      <h3 className="font-heading text-2xl font-bold text-white">
+                        {g.name}
+                      </h3>
+                      <p className="mt-1 font-medium text-emerald-400">
+                        {g.role} &bull; {g.experience}+ Years
+                      </p>
+                      <p className="mt-2 line-clamp-2 text-sm text-gray-300 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                        {g.bio}
+                      </p>
+
+                      {/* Social / Contact Actions */}
+                      <div className="mt-4 flex translate-y-4 items-center gap-3 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+                        <button
+                          type="button"
+                          className="grid h-10 w-10 place-items-center rounded-full bg-[#059669] text-white transition-transform hover:scale-110"
+                          aria-label={`Contact ${g.name}`}
+                        >
+                          <MessageCircle size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/packages", label: "Kashmir Packages" },
+  { to: "/hotels", label: "Hotels" },
   { to: "/packages", label: "Destinations", hash: "destinations" },
   { to: "/custom-tour", label: "Custom Tour" },
   { to: "/about", label: "About Us" },
@@ -223,6 +224,13 @@ export function Navbar() {
             className="rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
           >
             Kashmir Packages
+          </Link>
+          <Link
+            to="/hotels"
+            onClick={() => setOpen(false)}
+            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+          >
+            Hotels
           </Link>
           <a
             href="/#destinations"

@@ -35,6 +35,8 @@ import { TourCard } from "@/components/site/TourCard";
 import { StarRating } from "@/components/site/StarRating";
 import { BookingModal } from "@/components/site/BookingModal";
 import { WhatsAppIcon } from "@/components/site/Navbar";
+import { DestinationGalleryModal } from "@/components/site/DestinationGalleryModal";
+import { getDestinations, type DestinationItem } from "@/services/destinations";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -279,6 +281,36 @@ function PopularPackages({ onBook }: { onBook: (t: Tour) => void }) {
 /* --------------------------- Destinations --------------------------- */
 
 function Destinations() {
+  const [destList, setDestList] = useState<DestinationItem[]>([]);
+  const [selectedDestination, setSelectedDestination] = useState<DestinationItem | null>(null);
+
+  useEffect(() => {
+    getDestinations()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setDestList(data);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load destinations from API, using fallback:", err);
+      });
+  }, []);
+
+  // Use API destinations if available, otherwise map the fallback static list
+  const displayDestinations: DestinationItem[] =
+    destList.length > 0
+      ? destList
+      : destinations.map((d, idx) => ({
+          id: idx + 1,
+          name: d.name,
+          slug: d.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          description: d.description,
+          cover_image: d.image,
+          gallery: [d.image],
+          sort_order: idx + 1,
+          is_active: true,
+        }));
+
   return (
     <section id="destinations" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-20 sm:px-6 sm:py-24">
       <Reveal>
@@ -289,15 +321,16 @@ function Destinations() {
         />
       </Reveal>
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {destinations.map((d, i) => (
-          <Reveal key={d.name} delay={(i % 4) * 70}>
-            <Link
-              to="/packages"
-              className="card-hover group relative block aspect-[3/4] overflow-hidden rounded-3xl shadow-soft"
-              aria-label={`Explore ${d.name}`}
+        {displayDestinations.map((d, i) => (
+          <Reveal key={d.slug || d.name} delay={(i % 4) * 70}>
+            <button
+              type="button"
+              onClick={() => setSelectedDestination(d)}
+              className="card-hover group relative block aspect-[3/4] w-full overflow-hidden rounded-3xl shadow-soft text-left cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label={`View photos and explore ${d.name}`}
             >
               <img
-                src={d.image}
+                src={d.cover_image}
                 alt={`${d.name}, Azad Jammu & Kashmir`}
                 width={1280}
                 height={720}
@@ -311,17 +344,25 @@ function Destinations() {
                   {d.description}
                 </p>
                 <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white opacity-0 backdrop-blur transition-all duration-500 group-hover:opacity-100">
-                  Explore
+                  <Camera size={12} />
+                  View Gallery
                   <ArrowRight size={12} />
                 </span>
               </div>
-            </Link>
+            </button>
           </Reveal>
         ))}
       </div>
+
+      {/* Destination Lightbox Gallery Modal */}
+      <DestinationGalleryModal
+        destination={selectedDestination}
+        onClose={() => setSelectedDestination(null)}
+      />
     </section>
   );
 }
+
 
 /* ---------------------------- Inclusions ---------------------------- */
 

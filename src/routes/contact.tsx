@@ -42,13 +42,12 @@ function ContactPage() {
   };
 
   const inputCls = (hasError?: string) =>
-    `w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring ${
-      hasError ? "border-destructive" : "border-input"
+    `w-full rounded-xl border bg-background px-4 py-3 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring ${hasError ? "border-destructive" : "border-input"
     }`;
 
   return (
     <>
-      <section className="bg-secondary/40 pb-16 pt-36">
+      <section className="bg-secondary/90 pb-16 pt-36">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6">
           <h1 className="font-heading text-4xl font-extrabold text-foreground text-balance sm:text-5xl">
             Let's Plan Your Kashmir Trip

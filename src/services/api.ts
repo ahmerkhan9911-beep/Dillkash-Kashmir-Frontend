@@ -70,3 +70,27 @@ export async function api<T = unknown>(
   return data as T;
 }
 
+/**
+ * Upload a single image file to the server.
+ * Uses raw fetch with FormData (not JSON) so multer can parse the multipart body.
+ * Returns the public URL string on success, e.g. "/uploads/<uuid>.jpg"
+ */
+export async function uploadImage(file: File): Promise<string> {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await fetch(`${API_BASE}/upload`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || "Upload failed");
+  }
+
+  return (data as { url: string }).url;
+}

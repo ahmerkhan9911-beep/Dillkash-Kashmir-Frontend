@@ -14,15 +14,24 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CustomTourRouteImport } from './routes/custom-tour'
+import { Route as HotelsRouteImport } from './routes/hotels'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PackagesRouteImport } from './routes/packages'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminHotelsRouteImport } from './routes/admin/hotels'
 import { Route as AdminPackagesRouteImport } from './routes/admin/packages'
 import { Route as PackagesIndexRouteImport } from './routes/packages.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
+import { Route as AdminDestinationsIndexRouteImport } from './routes/admin/destinations.index'
+import { Route as AdminDestinationsCreateRouteImport } from './routes/admin/destinations.create'
+import { Route as AdminGuidesIndexRouteImport } from './routes/admin/guides.index'
+import { Route as AdminHotelsIndexRouteImport } from './routes/admin/hotels.index'
+import { Route as AdminHotelsCreateRouteImport } from './routes/admin/hotels.create'
 import { Route as AdminPackagesIndexRouteImport } from './routes/admin/packages.index'
 import { Route as AdminPackagesCreateRouteImport } from './routes/admin/packages.create'
+import { Route as AdminDestinationsIdEditRouteImport } from './routes/admin/destinations.$id.edit'
+import { Route as AdminHotelsIdEditRouteImport } from './routes/admin/hotels.$id.edit'
 import { Route as AdminPackagesIdEditRouteImport } from './routes/admin/packages.$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -50,6 +59,11 @@ const CustomTourRoute = CustomTourRouteImport.update({
   path: '/custom-tour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HotelsRoute = HotelsRouteImport.update({
+  id: '/hotels',
+  path: '/hotels',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -70,6 +84,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHotelsRoute = AdminHotelsRouteImport.update({
+  id: '/hotels',
+  path: '/hotels',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPackagesRoute = AdminPackagesRouteImport.update({
   id: '/packages',
   path: '/packages',
@@ -85,6 +104,31 @@ const PackagesSlugRoute = PackagesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => PackagesRoute,
 } as any)
+const AdminDestinationsIndexRoute = AdminDestinationsIndexRouteImport.update({
+  id: '/destinations/',
+  path: '/destinations/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDestinationsCreateRoute = AdminDestinationsCreateRouteImport.update({
+  id: '/destinations/create',
+  path: '/destinations/create',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGuidesIndexRoute = AdminGuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHotelsIndexRoute = AdminHotelsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminHotelsRoute,
+} as any)
+const AdminHotelsCreateRoute = AdminHotelsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminHotelsRoute,
+} as any)
 const AdminPackagesIndexRoute = AdminPackagesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -94,6 +138,16 @@ const AdminPackagesCreateRoute = AdminPackagesCreateRouteImport.update({
   id: '/create',
   path: '/create',
   getParentRoute: () => AdminPackagesRoute,
+} as any)
+const AdminDestinationsIdEditRoute = AdminDestinationsIdEditRouteImport.update({
+  id: '/destinations/$id/edit',
+  path: '/destinations/$id/edit',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHotelsIdEditRoute = AdminHotelsIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminHotelsRoute,
 } as any)
 const AdminPackagesIdEditRoute = AdminPackagesIdEditRouteImport.update({
   id: '/$id/edit',
@@ -107,15 +161,24 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/custom-tour': typeof CustomTourRoute
+  '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRouteWithChildren
   '/signup': typeof SignupRoute
+  '/admin/hotels': typeof AdminHotelsRouteWithChildren
   '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/packages/': typeof PackagesIndexRoute
+  '/admin/destinations/create': typeof AdminDestinationsCreateRoute
+  '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
+  '/admin/destinations/': typeof AdminDestinationsIndexRoute
+  '/admin/guides/': typeof AdminGuidesIndexRoute
+  '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
+  '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
+  '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
   '/admin/packages/$id/edit': typeof AdminPackagesIdEditRoute
 }
 export interface FileRoutesByTo {
@@ -123,13 +186,21 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/custom-tour': typeof CustomTourRoute
+  '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/packages': typeof PackagesIndexRoute
+  '/admin/destinations/create': typeof AdminDestinationsCreateRoute
+  '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
+  '/admin/destinations': typeof AdminDestinationsIndexRoute
+  '/admin/guides': typeof AdminGuidesIndexRoute
+  '/admin/hotels': typeof AdminHotelsIndexRoute
   '/admin/packages': typeof AdminPackagesIndexRoute
+  '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
+  '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
   '/admin/packages/$id/edit': typeof AdminPackagesIdEditRoute
 }
 export interface FileRoutesById {
@@ -139,15 +210,24 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/custom-tour': typeof CustomTourRoute
+  '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRouteWithChildren
   '/signup': typeof SignupRoute
+  '/admin/hotels': typeof AdminHotelsRouteWithChildren
   '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/packages/': typeof PackagesIndexRoute
+  '/admin/destinations/create': typeof AdminDestinationsCreateRoute
+  '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
+  '/admin/destinations/': typeof AdminDestinationsIndexRoute
+  '/admin/guides/': typeof AdminGuidesIndexRoute
+  '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
+  '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
+  '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
   '/admin/packages/$id/edit': typeof AdminPackagesIdEditRoute
 }
 export interface FileRouteTypes {
@@ -158,15 +238,24 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/custom-tour'
+    | '/hotels'
     | '/login'
     | '/packages'
     | '/signup'
+    | '/admin/hotels'
     | '/admin/packages'
     | '/packages/$slug'
     | '/admin/'
     | '/packages/'
+    | '/admin/destinations/create'
+    | '/admin/hotels/create'
     | '/admin/packages/create'
+    | '/admin/destinations/'
+    | '/admin/guides/'
+    | '/admin/hotels/'
     | '/admin/packages/'
+    | '/admin/destinations/$id/edit'
+    | '/admin/hotels/$id/edit'
     | '/admin/packages/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -174,13 +263,21 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/custom-tour'
+    | '/hotels'
     | '/login'
     | '/signup'
     | '/packages/$slug'
     | '/admin'
     | '/packages'
+    | '/admin/destinations/create'
+    | '/admin/hotels/create'
     | '/admin/packages/create'
+    | '/admin/destinations'
+    | '/admin/guides'
+    | '/admin/hotels'
     | '/admin/packages'
+    | '/admin/destinations/$id/edit'
+    | '/admin/hotels/$id/edit'
     | '/admin/packages/$id/edit'
   id:
     | '__root__'
@@ -189,15 +286,24 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/custom-tour'
+    | '/hotels'
     | '/login'
     | '/packages'
     | '/signup'
+    | '/admin/hotels'
     | '/admin/packages'
     | '/packages/$slug'
     | '/admin/'
     | '/packages/'
+    | '/admin/destinations/create'
+    | '/admin/hotels/create'
     | '/admin/packages/create'
+    | '/admin/destinations/'
+    | '/admin/guides/'
+    | '/admin/hotels/'
     | '/admin/packages/'
+    | '/admin/destinations/$id/edit'
+    | '/admin/hotels/$id/edit'
     | '/admin/packages/$id/edit'
   fileRoutesById: FileRoutesById
 }
@@ -207,6 +313,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   CustomTourRoute: typeof CustomTourRoute
+  HotelsRoute: typeof HotelsRoute
   LoginRoute: typeof LoginRoute
   PackagesRoute: typeof PackagesRouteWithChildren
   SignupRoute: typeof SignupRoute
@@ -249,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CustomTourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hotels': {
+      id: '/hotels'
+      path: '/hotels'
+      fullPath: '/hotels'
+      preLoaderRoute: typeof HotelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -277,6 +391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/hotels': {
+      id: '/admin/hotels'
+      path: '/hotels'
+      fullPath: '/admin/hotels'
+      preLoaderRoute: typeof AdminHotelsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/packages': {
       id: '/admin/packages'
       path: '/packages'
@@ -298,6 +419,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PackagesSlugRouteImport
       parentRoute: typeof PackagesRoute
     }
+    '/admin/destinations/': {
+      id: '/admin/destinations/'
+      path: '/destinations'
+      fullPath: '/admin/destinations/'
+      preLoaderRoute: typeof AdminDestinationsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/destinations/create': {
+      id: '/admin/destinations/create'
+      path: '/destinations/create'
+      fullPath: '/admin/destinations/create'
+      preLoaderRoute: typeof AdminDestinationsCreateRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/guides/': {
+      id: '/admin/guides/'
+      path: '/guides'
+      fullPath: '/admin/guides/'
+      preLoaderRoute: typeof AdminGuidesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/hotels/': {
+      id: '/admin/hotels/'
+      path: '/'
+      fullPath: '/admin/hotels/'
+      preLoaderRoute: typeof AdminHotelsIndexRouteImport
+      parentRoute: typeof AdminHotelsRoute
+    }
+    '/admin/hotels/create': {
+      id: '/admin/hotels/create'
+      path: '/create'
+      fullPath: '/admin/hotels/create'
+      preLoaderRoute: typeof AdminHotelsCreateRouteImport
+      parentRoute: typeof AdminHotelsRoute
+    }
     '/admin/packages/': {
       id: '/admin/packages/'
       path: '/'
@@ -312,6 +468,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPackagesCreateRouteImport
       parentRoute: typeof AdminPackagesRoute
     }
+    '/admin/destinations/$id/edit': {
+      id: '/admin/destinations/$id/edit'
+      path: '/destinations/$id/edit'
+      fullPath: '/admin/destinations/$id/edit'
+      preLoaderRoute: typeof AdminDestinationsIdEditRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/hotels/$id/edit': {
+      id: '/admin/hotels/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/hotels/$id/edit'
+      preLoaderRoute: typeof AdminHotelsIdEditRouteImport
+      parentRoute: typeof AdminHotelsRoute
+    }
     '/admin/packages/$id/edit': {
       id: '/admin/packages/$id/edit'
       path: '/$id/edit'
@@ -321,6 +491,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminHotelsRouteChildren {
+  AdminHotelsCreateRoute: typeof AdminHotelsCreateRoute
+  AdminHotelsIndexRoute: typeof AdminHotelsIndexRoute
+  AdminHotelsIdEditRoute: typeof AdminHotelsIdEditRoute
+}
+
+const AdminHotelsRouteChildren: AdminHotelsRouteChildren = {
+  AdminHotelsCreateRoute: AdminHotelsCreateRoute,
+  AdminHotelsIndexRoute: AdminHotelsIndexRoute,
+  AdminHotelsIdEditRoute: AdminHotelsIdEditRoute,
+}
+
+const AdminHotelsRouteWithChildren = AdminHotelsRoute._addFileChildren(
+  AdminHotelsRouteChildren,
+)
 
 interface AdminPackagesRouteChildren {
   AdminPackagesCreateRoute: typeof AdminPackagesCreateRoute
@@ -339,13 +525,23 @@ const AdminPackagesRouteWithChildren = AdminPackagesRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminHotelsRoute: typeof AdminHotelsRouteWithChildren
   AdminPackagesRoute: typeof AdminPackagesRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminDestinationsCreateRoute: typeof AdminDestinationsCreateRoute
+  AdminDestinationsIndexRoute: typeof AdminDestinationsIndexRoute
+  AdminGuidesIndexRoute: typeof AdminGuidesIndexRoute
+  AdminDestinationsIdEditRoute: typeof AdminDestinationsIdEditRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminHotelsRoute: AdminHotelsRouteWithChildren,
   AdminPackagesRoute: AdminPackagesRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminDestinationsCreateRoute: AdminDestinationsCreateRoute,
+  AdminDestinationsIndexRoute: AdminDestinationsIndexRoute,
+  AdminGuidesIndexRoute: AdminGuidesIndexRoute,
+  AdminDestinationsIdEditRoute: AdminDestinationsIdEditRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -370,6 +566,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   CustomTourRoute: CustomTourRoute,
+  HotelsRoute: HotelsRoute,
   LoginRoute: LoginRoute,
   PackagesRoute: PackagesRouteWithChildren,
   SignupRoute: SignupRoute,

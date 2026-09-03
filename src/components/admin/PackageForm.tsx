@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Plus, Trash2, Loader2, Save } from "lucide-react";
+import { useState, useCallback } from "react";
+import { Plus, Trash2, Loader2, Save, Upload } from "lucide-react";
+import { ImageUploader } from "./ImageUploader";
+import { GalleryUploader } from "./GalleryUploader";
 
 export interface PackageFormData {
   title: string;
@@ -34,7 +36,7 @@ const emptyForm: PackageFormData = {
   departure_day: "", transport: "", accommodation: "", meals: "",
   featured: false, is_active: true, next_departure: "",
   destinations: [""], itinerary: [{ day: 1, title: "", details: [""] }],
-  included: [""], notIncluded: [""], gallery: [""],
+  included: [""], notIncluded: [""], gallery: [],
 };
 
 interface PackageFormProps {
@@ -47,6 +49,12 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
   const [form, setForm] = useState<PackageFormData>({ ...emptyForm, ...initial });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [uploadingCount, setUploadingCount] = useState(0);
+
+  /** Increment or decrement the in-progress upload counter */
+  const handleUploadingChange = useCallback((uploading: boolean) => {
+    setUploadingCount((c) => Math.max(0, c + (uploading ? 1 : -1)));
+  }, []);
 
   const set = <K extends keyof PackageFormData>(key: K, value: PackageFormData[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -168,9 +176,13 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
             <label className={labelCls}>Reviews Count</label>
             <input type="number" min={0} value={form.reviews_count} onChange={(e) => set("reviews_count", Number(e.target.value))} className={inputCls} />
           </div>
-          <div>
-            <label className={labelCls}>Image URL</label>
-            <input value={form.image_url} onChange={(e) => set("image_url", e.target.value)} className={inputCls} placeholder="https://... or /assets/..." />
+          <div className="sm:col-span-2">
+            <ImageUploader
+              label="Package Thumbnail Image"
+              value={form.image_url}
+              onChange={(url) => set("image_url", url)}
+              onUploadingChange={handleUploadingChange}
+            />
           </div>
         </div>
       </fieldset>
@@ -321,23 +333,14 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
         </fieldset>
       </div>
 
-      {/* Gallery */}
       <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-        <legend className="px-2 font-heading text-base font-bold text-foreground">Gallery (Image URLs)</legend>
-        <div className="mt-2 grid gap-2">
-          {form.gallery.map((url, i) => (
-            <div key={i} className="flex gap-2">
-              <input value={url} onChange={(e) => updateArray("gallery", i, e.target.value)} className={inputCls} placeholder="https://... or /assets/..." />
-              {form.gallery.length > 1 && (
-                <button type="button" onClick={() => removeFromArray("gallery", i)} className="shrink-0 rounded-xl p-2.5 text-destructive hover:bg-destructive/10">
-                  <Trash2 size={16} />
-                </button>
-              )}
-            </div>
-          ))}
-          <button type="button" onClick={() => addToArray("gallery")} className="mt-1 flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-            <Plus size={16} /> Add Image URL
-          </button>
+        <legend className="px-2 font-heading text-base font-bold text-foreground">Gallery</legend>
+        <div className="mt-2">
+          <GalleryUploader
+            value={form.gallery}
+            onChange={(urls) => set("gallery", urls)}
+            onUploadingChange={handleUploadingChange}
+          />
         </div>
       </fieldset>
 
@@ -345,11 +348,11 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || uploadingCount > 0}
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-[1.02] disabled:opacity-60"
         >
-          {loading ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-          {loading ? "Saving..." : submitLabel}
+          {loading ? <Loader2 size={18} className="animate-spin" /> : uploadingCount > 0 ? <Upload size={18} className="animate-bounce" /> : <Save size={18} />}
+          {loading ? "Saving..." : uploadingCount > 0 ? `Uploading (${uploadingCount})…` : submitLabel}
         </button>
       </div>
     </form>
