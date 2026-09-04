@@ -3,9 +3,11 @@
  * All API calls go through this module so auth headers are attached automatically.
  */
 
-const API_BASE = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
-  ? String(import.meta.env["VITE_API_URL"])
-  : "http://localhost:5000/api";
+const RAW_API_URL = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
+  ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
+  : "https://api.dillkashkashmir.com/api";
+
+const API_BASE = RAW_API_URL.endsWith("/api") ? RAW_API_URL : `${RAW_API_URL}/api`;
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;

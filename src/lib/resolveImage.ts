@@ -58,9 +58,10 @@ export function resolveImageUrl(url: string | null | undefined): string {
 
   // Uploaded files hosted by Express API server
   if (url.startsWith("/uploads/")) {
-    const base = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
-      ? String(import.meta.env["VITE_API_URL"]).replace(/\/api$/, "")
-      : "http://localhost:5000";
+    const rawUrl = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
+      ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
+      : "https://api.dillkashkashmir.com";
+    const base = rawUrl.replace(/\/api$/, "");
     return `${base}${url}`;
   }
 
