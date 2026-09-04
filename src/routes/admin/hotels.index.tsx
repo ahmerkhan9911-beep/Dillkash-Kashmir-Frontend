@@ -18,6 +18,7 @@ import {
 } from "@/services/hotels";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 import { formatPKR } from "@/data/site";
+import { resolveImageUrl } from "@/lib/resolveImage";
 import type { Hotel as HotelType } from "@/data/hotels";
 
 export const Route = createFileRoute("/admin/hotels/")({
@@ -30,6 +31,7 @@ function AdminHotels() {
   const [deleteTarget, setDeleteTarget] = useState<HotelType | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error">("success");
 
   const load = () => {
     setLoading(true);
@@ -48,12 +50,15 @@ function AdminHotels() {
     setDeleteLoading(true);
     try {
       await deleteHotelApi(deleteTarget.id);
+      setMessageType("success");
       setMessage(`"${deleteTarget.name}" deleted successfully`);
       setDeleteTarget(null);
       load();
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Delete failed");
+      setMessageType("error");
+      setMessage(err instanceof Error ? err.message : "Delete failed. Please try again.");
+      setTimeout(() => setMessage(""), 4000);
     } finally {
       setDeleteLoading(false);
     }
@@ -88,9 +93,13 @@ function AdminHotels() {
         </Link>
       </div>
 
-      {/* ── Success message ── */}
+      {/* ── Toast message ── */}
       {message && (
-        <div className="mb-5 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
+        <div className={`mb-5 rounded-xl border px-4 py-3 text-sm font-medium ${
+          messageType === "error"
+            ? "border-destructive/30 bg-destructive/10 text-destructive"
+            : "border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
+        }`}>
           {message}
         </div>
       )}
@@ -152,13 +161,18 @@ function AdminHotels() {
               className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-4 shadow-soft sm:flex-row sm:items-center md:grid md:grid-cols-[80px_1fr_120px_100px_100px_100px_120px] md:gap-4 md:p-3"
             >
               {/* Thumbnail */}
-              <div className="h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
-                {hotel.images[0] && (
+              <div className="flex h-16 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
+                {hotel.images && hotel.images[0] ? (
                   <img
-                    src={hotel.images[0]}
+                    src={resolveImageUrl(hotel.images[0])}
                     alt={hotel.name}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
                   />
+                ) : (
+                  <Hotel size={24} className="text-muted-foreground/40" />
                 )}
               </div>
 

@@ -1,0 +1,241 @@
+import { n as __toESM } from "../_runtime.mjs";
+import { t as resolveImageUrl } from "./resolveImage-BSOQr9n2.mjs";
+import { i as uploadImage } from "./api-CJHRqUur.mjs";
+import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
+import { B as ImagePlus, P as LoaderCircle, Q as CircleAlert, t as X } from "../_libs/lucide-react.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/GalleryUploader-TO0YaacD.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+var ALLOWED_TYPES = [
+	"image/jpeg",
+	"image/jpg",
+	"image/png",
+	"image/webp"
+];
+var MAX_BYTES = 5242880;
+function validateFile(file) {
+	if (!ALLOWED_TYPES.includes(file.type)) return "Only JPG, PNG, and WebP are allowed.";
+	if (file.size > MAX_BYTES) return "File must be smaller than 5 MB.";
+	return null;
+}
+function GalleryUploader({ value, onChange, onUploadingChange }) {
+	const [pending, setPending] = (0, import_react.useState)([]);
+	const [dragging, setDragging] = (0, import_react.useState)(false);
+	const [globalError, setGlobalError] = (0, import_react.useState)(null);
+	const inputRef = (0, import_react.useRef)(null);
+	const errorCls = "mt-1.5 text-xs font-medium text-destructive";
+	const pendingIdsRef = (0, import_react.useRef)(/* @__PURE__ */ new Set());
+	const notifyParent = (0, import_react.useCallback)((id, done) => {
+		if (done) pendingIdsRef.current.delete(id);
+		else pendingIdsRef.current.add(id);
+		onUploadingChange?.(pendingIdsRef.current.size > 0);
+	}, [onUploadingChange]);
+	const valueRef = (0, import_react.useRef)(value);
+	valueRef.current = value;
+	const handleFiles = (0, import_react.useCallback)(async (files) => {
+		setGlobalError(null);
+		const fileArr = Array.from(files);
+		const errors = [];
+		const valid = [];
+		for (const f of fileArr) {
+			const e = validateFile(f);
+			if (e) errors.push(`"${f.name}": ${e}`);
+			else valid.push(f);
+		}
+		if (errors.length) setGlobalError(errors.join(" · "));
+		if (!valid.length) return;
+		const thumbs = valid.map((f) => ({
+			id: `${Date.now()}-${Math.random()}`,
+			preview: URL.createObjectURL(f),
+			error: null
+		}));
+		setPending((prev) => [...prev, ...thumbs]);
+		const resolvedUrls = [];
+		await Promise.all(valid.map(async (file, i) => {
+			const thumb = thumbs[i];
+			notifyParent(thumb.id, false);
+			try {
+				const url = await uploadImage(file);
+				resolvedUrls.push(url);
+				setPending((prev) => prev.filter((t) => t.id !== thumb.id));
+			} catch (err) {
+				const msg = err instanceof Error ? err.message : "Upload failed";
+				setPending((prev) => prev.map((t) => t.id === thumb.id ? {
+					...t,
+					error: msg
+				} : t));
+			} finally {
+				notifyParent(thumb.id, true);
+			}
+		}));
+		if (resolvedUrls.length > 0) onChange([...valueRef.current, ...resolvedUrls]);
+	}, [onChange, notifyParent]);
+	const onDragOver = (e) => {
+		e.preventDefault();
+		setDragging(true);
+	};
+	const onDragLeave = () => setDragging(false);
+	const onDrop = (e) => {
+		e.preventDefault();
+		setDragging(false);
+		if (e.dataTransfer.files?.length) handleFiles(e.dataTransfer.files);
+	};
+	const onFileChange = (e) => {
+		if (e.target.files?.length) handleFiles(e.target.files);
+		e.target.value = "";
+	};
+	const removeUrl = (idx) => {
+		onChange(value.filter((_, i) => i !== idx));
+	};
+	const dismissPending = (id) => {
+		setPending((prev) => {
+			const thumb = prev.find((t) => t.id === id);
+			if (thumb) URL.revokeObjectURL(thumb.preview);
+			return prev.filter((t) => t.id !== id);
+		});
+		notifyParent(id, true);
+	};
+	const hasThumbs = value.length > 0 || pending.length > 0;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
+		hasThumbs && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "mb-3 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5",
+			children: [value.map((url, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(UploadedThumb, {
+				src: resolveImageUrl(url),
+				label: `Gallery image ${idx + 1}`,
+				onRemove: () => removeUrl(idx)
+			}, `uploaded-${idx}-${url}`)), pending.map((thumb) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative aspect-square overflow-hidden rounded-xl border border-border bg-muted",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+					src: thumb.preview,
+					alt: "Uploading…",
+					className: ["h-full w-full object-cover", thumb.error ? "opacity-30" : "opacity-60"].join(" ")
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "absolute inset-0 flex flex-col items-center justify-center gap-1",
+					children: thumb.error ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, {
+							size: 16,
+							className: "text-destructive"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "px-1 text-center text-[10px] font-semibold leading-tight text-destructive",
+							children: thumb.error
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+							type: "button",
+							onClick: () => dismissPending(thumb.id),
+							className: "mt-0.5 rounded-full bg-destructive/80 p-0.5 text-destructive-foreground",
+							title: "Dismiss",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { size: 10 })
+						})
+					] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, {
+						size: 22,
+						className: "animate-spin text-primary drop-shadow"
+					})
+				})]
+			}, thumb.id))]
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			role: "button",
+			tabIndex: 0,
+			onDragOver,
+			onDragLeave,
+			onDrop,
+			onClick: () => inputRef.current?.click(),
+			onKeyDown: (e) => e.key === "Enter" && inputRef.current?.click(),
+			className: ["flex min-h-[6rem] cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition-colors outline-none", dragging ? "border-primary bg-primary/5" : "border-border bg-muted/30 hover:border-primary/60 hover:bg-primary/5"].join(" "),
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ImagePlus, {
+						size: 18,
+						className: "text-primary"
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-xs font-semibold text-foreground",
+					children: dragging ? "Drop images here" : hasThumbs ? "+ Add More Images" : "Drag & drop or click to browse"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "text-[11px] text-muted-foreground",
+					children: "JPG, PNG, WebP — max 5 MB each"
+				})
+			]
+		}),
+		/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+			ref: inputRef,
+			type: "file",
+			accept: "image/jpeg,image/jpg,image/png,image/webp",
+			multiple: true,
+			className: "hidden",
+			onChange: onFileChange
+		}),
+		globalError && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+			className: errorCls,
+			children: globalError
+		})
+	] });
+}
+function UploadedThumb({ src, label, onRemove }) {
+	const [loaded, setLoaded] = (0, import_react.useState)(false);
+	const [failed, setFailed] = (0, import_react.useState)(false);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted",
+		children: [
+			!loaded && !failed && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "absolute inset-0 flex items-center justify-center bg-muted",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(LoaderCircle, {
+					size: 18,
+					className: "animate-spin text-primary/50"
+				})
+			}),
+			failed && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex h-full flex-col items-center justify-center gap-1 px-1",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleAlert, {
+						size: 16,
+						className: "text-destructive/70"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-center text-[10px] font-medium text-destructive leading-tight",
+						children: "Failed to load"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						type: "button",
+						onClick: () => {
+							setFailed(false);
+							setLoaded(false);
+						},
+						className: "mt-0.5 text-[10px] font-semibold text-primary underline",
+						children: "Retry"
+					})
+				]
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+				ref: (el) => {
+					if (el && el.complete && el.naturalWidth > 0 && !loaded) setLoaded(true);
+				},
+				src,
+				alt: label,
+				className: [
+					"h-full w-full object-cover transition-opacity duration-200",
+					loaded ? "opacity-100" : "opacity-0",
+					failed ? "hidden" : ""
+				].join(" "),
+				onLoad: () => setLoaded(true),
+				onError: () => {
+					setFailed(true);
+					setLoaded(false);
+				}
+			}),
+			!failed && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+				type: "button",
+				onClick: onRemove,
+				className: "absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive/90 text-destructive-foreground opacity-0 shadow transition-opacity group-hover:opacity-100",
+				title: "Remove",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { size: 12 })
+			})
+		]
+	});
+}
+//#endregion
+export { GalleryUploader as t };

@@ -8,7 +8,10 @@ import {
   BadgeCheck,
   Bus,
   Car,
+  Facebook,
+  Globe,
   HeartHandshake,
+  Instagram,
   MapPin,
   MessageCircle,
   ShieldCheck,
@@ -189,42 +192,62 @@ function AboutPage() {
           </Reveal>
 
           {guides.length > 0 && (
-            <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {guides.map((g, i) => (
                 <Reveal key={g.id} delay={i * 100}>
-                  <div className="group relative aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition-shadow duration-500 hover:shadow-xl">
-                    {/* Background Image */}
+                  {/* 1. Main Card Container */}
+                  <div className="relative overflow-hidden rounded-2xl group cursor-pointer shadow-lg aspect-[3/4]">
+                    {/* Profile Image — fills entire card */}
                     <img
                       src={resolveImageUrl(g.imageUrl)}
                       alt={g.name}
                       loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
+                      className="w-full h-full object-cover"
                     />
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-500 group-hover:from-black/95" />
+                    {/* 2. Dark Overlay — hidden by default, fades in on hover */}
+                    <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" />
 
-                    {/* Content */}
-                    <div className="absolute bottom-0 left-0 flex w-full flex-col justify-end p-6">
-                      <h3 className="font-heading text-2xl font-bold text-white">
+                    {/* 3. Content Container — slides up & fades in on hover */}
+                    <div className="absolute bottom-0 w-full p-6 flex flex-col items-center text-center transform translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-in-out">
+                      {/* 4. Typography */}
+                      <h3 className="text-2xl font-bold text-white tracking-wide">
                         {g.name}
                       </h3>
-                      <p className="mt-1 font-medium text-emerald-400">
+                      <p className="text-emerald-400 font-medium text-sm mt-1">
                         {g.role} &bull; {g.experience}+ Years
                       </p>
-                      <p className="mt-2 line-clamp-2 text-sm text-gray-300 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                        {g.bio}
-                      </p>
 
-                      {/* Social / Contact Actions */}
-                      <div className="mt-4 flex translate-y-4 items-center gap-3 opacity-0 transition-all duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100">
-                        <button
-                          type="button"
-                          className="grid h-10 w-10 place-items-center rounded-full bg-[#059669] text-white transition-transform hover:scale-110"
-                          aria-label={`Contact ${g.name}`}
+                      {/* Social Icons */}
+                      <div className="flex gap-4 mt-4">
+                        <a
+                          href="#"
+                          aria-label={`${g.name} on Facebook`}
+                          className="text-gray-300 hover:text-white transition-colors cursor-pointer"
                         >
-                          <MessageCircle size={18} />
-                        </button>
+                          <Facebook size={20} />
+                        </a>
+                        <a
+                          href="#"
+                          aria-label={`${g.name} on Instagram`}
+                          className="text-gray-300 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <Instagram size={20} />
+                        </a>
+                        <a
+                          href="#"
+                          aria-label={`Chat with ${g.name}`}
+                          className="text-gray-300 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <MessageCircle size={20} />
+                        </a>
+                        <a
+                          href="#"
+                          aria-label={`${g.name}'s website`}
+                          className="text-gray-300 hover:text-white transition-colors cursor-pointer"
+                        >
+                          <Globe size={20} />
+                        </a>
                       </div>
                     </div>
                   </div>

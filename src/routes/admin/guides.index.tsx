@@ -48,6 +48,7 @@ function AdminGuides() {
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error">("success");
 
   /* Delete state */
   const [deleteTarget, setDeleteTarget] = useState<Guide | null>(null);
@@ -82,12 +83,15 @@ function AdminGuides() {
     setDeleteLoading(true);
     try {
       await deleteGuideApi(deleteTarget.id);
+      setMessageType("success");
       setMessage(`"${deleteTarget.name}" deleted successfully`);
       setDeleteTarget(null);
       load();
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Delete failed");
+      setMessageType("error");
+      setMessage(err instanceof Error ? err.message : "Delete failed. Please try again.");
+      setTimeout(() => setMessage(""), 4000);
     } finally {
       setDeleteLoading(false);
     }
@@ -140,16 +144,20 @@ function AdminGuides() {
     try {
       if (editingId) {
         await updateGuide(editingId, { ...form });
+        setMessageType("success");
         setMessage("Guide updated successfully");
       } else {
         await createGuide({ ...form, is_active: true });
+        setMessageType("success");
         setMessage("Guide created successfully");
       }
       closeModal();
       load();
       setTimeout(() => setMessage(""), 3000);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Save failed");
+      setMessageType("error");
+      setMessage(err instanceof Error ? err.message : "Failed to save. Please try again.");
+      setTimeout(() => setMessage(""), 4000);
     } finally {
       setSaving(false);
     }
@@ -182,9 +190,13 @@ function AdminGuides() {
         </button>
       </div>
 
-      {/* ── Success message ── */}
+      {/* ── Toast message ── */}
       {message && (
-        <div className="mb-5 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm font-medium text-primary">
+        <div className={`mb-5 rounded-xl border px-4 py-3 text-sm font-medium ${
+          messageType === "error"
+            ? "border-destructive/30 bg-destructive/10 text-destructive"
+            : "border-emerald-500/30 bg-emerald-500/10 text-emerald-700"
+        }`}>
           {message}
         </div>
       )}

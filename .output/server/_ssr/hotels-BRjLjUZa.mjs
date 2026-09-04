@@ -1,0 +1,505 @@
+import { n as __toESM } from "../_runtime.mjs";
+import { t as hero_kashmir_default } from "./hero-kashmir-DsCeeA-a.mjs";
+import { c as whatsappLink, n as formatPKR } from "./site-Dg0SHnY9.mjs";
+import { t as resolveImageUrl } from "./resolveImage-BSOQr9n2.mjs";
+import { t as cn } from "./utils-C_uf36nf.mjs";
+import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
+import { t as Reveal } from "./Reveal-CRQyoRRE.mjs";
+import { $ as ChevronRight, D as MessageCircle, G as Flame, Y as Coffee, d as Star, et as ChevronLeft, f as Sparkles, k as MapPin, n as Wifi, p as SlidersHorizontal, q as Eye, rt as Car, t as X, tt as ChevronDown, v as Search, z as Images } from "../_libs/lucide-react.mjs";
+import { n as HOTEL_LOCATIONS, r as STAR_OPTIONS, t as HOTEL_AMENITIES } from "./hotels-BRLCSHY7.mjs";
+import { a as getHotels } from "./hotels-DBWefKbg.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/hotels-BRjLjUZa.js
+var import_react = /* @__PURE__ */ __toESM(require_react());
+var import_jsx_runtime = require_jsx_runtime();
+var amenityIcons = {
+	WiFi: Wifi,
+	Heater: Flame,
+	"River View": Eye,
+	Parking: Car,
+	"Complimentary Breakfast": Coffee,
+	"Room Service": Coffee,
+	"Hot Water": Flame,
+	"Generator Backup": Sparkles
+};
+function HotelsPage() {
+	const [hotels, setHotels] = (0, import_react.useState)([]);
+	const [loading, setLoading] = (0, import_react.useState)(true);
+	const [starFilters, setStarFilters] = (0, import_react.useState)([]);
+	const [locationFilter, setLocationFilter] = (0, import_react.useState)("");
+	const [priceMin, setPriceMin] = (0, import_react.useState)("");
+	const [priceMax, setPriceMax] = (0, import_react.useState)("");
+	const [amenityFilters, setAmenityFilters] = (0, import_react.useState)([]);
+	const [searchQuery, setSearchQuery] = (0, import_react.useState)("");
+	const [filtersOpen, setFiltersOpen] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		setLoading(true);
+		getHotels().then(setHotels).catch(console.error).finally(() => setLoading(false));
+	}, []);
+	const toggleStar = (star) => setStarFilters((prev) => prev.includes(star) ? prev.filter((s) => s !== star) : [...prev, star]);
+	const toggleAmenity = (amenity) => setAmenityFilters((prev) => prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity]);
+	const activeFilterCount = starFilters.length + (locationFilter ? 1 : 0) + (priceMin !== "" ? 1 : 0) + (priceMax !== "" ? 1 : 0) + amenityFilters.length + (searchQuery ? 1 : 0);
+	const clearAllFilters = () => {
+		setStarFilters([]);
+		setLocationFilter("");
+		setPriceMin("");
+		setPriceMax("");
+		setAmenityFilters([]);
+		setSearchQuery("");
+	};
+	const filtered = (0, import_react.useMemo)(() => {
+		return hotels.filter((hotel) => {
+			if (starFilters.length > 0 && !starFilters.includes(hotel.starRating)) return false;
+			if (locationFilter && hotel.location !== locationFilter) return false;
+			if (priceMin !== "" && hotel.pricePerNight < priceMin) return false;
+			if (priceMax !== "" && hotel.pricePerNight > priceMax) return false;
+			if (amenityFilters.length > 0 && !amenityFilters.every((a) => hotel.amenities.includes(a))) return false;
+			if (searchQuery && !hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) && !hotel.location.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+			return true;
+		});
+	}, [
+		hotels,
+		starFilters,
+		locationFilter,
+		priceMin,
+		priceMax,
+		amenityFilters,
+		searchQuery
+	]);
+	const emptyMessage = (0, import_react.useMemo)(() => {
+		const parts = [];
+		if (starFilters.length === 1) parts.push(`${starFilters[0]}-star`);
+		else if (starFilters.length > 1) parts.push("selected rating");
+		parts.push("hotels");
+		if (locationFilter) parts.push(`in ${locationFilter}`);
+		if (priceMin !== "" || priceMax !== "") parts.push("in this price range");
+		return `No ${parts.join(" ")} found`;
+	}, [
+		starFilters,
+		locationFilter,
+		priceMin,
+		priceMax
+	]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+		className: "relative flex min-h-[340px] items-end overflow-hidden bg-[#064E3B] sm:min-h-[400px]",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+				src: hero_kashmir_default,
+				alt: "Kashmir mountains",
+				className: "absolute inset-0 h-full w-full object-cover opacity-40"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "absolute inset-0 bg-gradient-to-t from-[#064E3B] via-[#064E3B]/60 to-transparent" }),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				className: "relative mx-auto w-full max-w-7xl px-4 pb-10 pt-32 sm:px-6 sm:pb-14 sm:pt-36",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Reveal, { children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "mb-3 inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3 py-1 text-xs font-bold text-amber-300 backdrop-blur-sm",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Star, {
+							size: 12,
+							className: "fill-amber-400 text-amber-400"
+						}), "Luxury to Budget — Every Traveler Welcome"]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
+						className: "font-heading text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl",
+						children: [
+							"Find Your Perfect Stay",
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "text-emerald-300",
+								children: "in Kashmir"
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "mt-3 max-w-xl text-sm leading-relaxed text-emerald-100/80 sm:text-base",
+						children: "From world-class 5-star resorts to authentic Kashmiri guest houses — discover and book standalone hotels across the valley."
+					})
+				] })
+			})
+		]
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+		className: "mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "relative flex-1 sm:max-w-sm",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, {
+					size: 18,
+					className: "absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+					type: "text",
+					value: searchQuery,
+					onChange: (e) => setSearchQuery(e.target.value),
+					placeholder: "Search hotels or locations...",
+					className: "w-full rounded-xl border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex items-center gap-2",
+				children: [activeFilterCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+					onClick: clearAllFilters,
+					className: "inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { size: 14 }),
+						"Clear All (",
+						activeFilterCount,
+						")"
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+					onClick: () => setFiltersOpen(!filtersOpen),
+					className: cn("inline-flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-colors lg:hidden", filtersOpen ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground hover:bg-secondary"),
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlidersHorizontal, { size: 16 }),
+						"Filters",
+						activeFilterCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-bold text-white",
+							children: activeFilterCount
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, {
+							size: 14,
+							className: cn("transition-transform", filtersOpen && "rotate-180")
+						})
+					]
+				})]
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-col gap-6 lg:flex-row",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("aside", {
+				className: cn("w-full shrink-0 overflow-hidden transition-all duration-300 lg:block lg:w-72 lg:overflow-visible", filtersOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 lg:max-h-none lg:opacity-100"),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "rounded-2xl border border-border bg-card p-5 shadow-soft",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							className: "mb-4 font-heading text-sm font-bold text-foreground",
+							children: "Filters"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mb-5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+								className: "mb-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground",
+								children: "Star Rating"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "grid gap-1.5",
+								children: STAR_OPTIONS.map((star) => {
+									const checked = starFilters.includes(star);
+									const is5Star = star === 5;
+									return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+										type: "button",
+										onClick: () => toggleStar(star),
+										className: cn("flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors", checked ? is5Star ? "bg-amber-50 text-amber-800 ring-1 ring-amber-300" : "bg-primary/10 text-primary ring-1 ring-primary/30" : "text-foreground hover:bg-secondary", is5Star && !checked && "bg-amber-50/50"),
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: cn("grid h-4 w-4 shrink-0 place-items-center rounded border text-[10px]", checked ? is5Star ? "border-amber-500 bg-amber-500 text-white" : "border-primary bg-primary text-white" : "border-border bg-background"),
+												children: checked && "✓"
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "flex items-center gap-0.5",
+												children: Array.from({ length: star }, (_, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Star, {
+													size: 14,
+													className: "fill-amber-400 text-amber-400"
+												}, i))
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+												className: "ml-auto text-xs text-muted-foreground",
+												children: [star, "-Star"]
+											}),
+											is5Star && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+												className: "rounded-full bg-amber-400 px-1.5 py-0.5 text-[9px] font-bold text-amber-900",
+												children: "LUXURY"
+											})
+										]
+									}, star);
+								})
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mb-5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+								className: "mb-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground",
+								children: "Location"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
+								value: locationFilter,
+								onChange: (e) => setLocationFilter(e.target.value),
+								className: "w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+									value: "",
+									children: "All Locations"
+								}), HOTEL_LOCATIONS.map((loc) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+									value: loc,
+									children: loc
+								}, loc))]
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "mb-5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+								className: "mb-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground",
+								children: "Price Range (Per Night)"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex items-center gap-2",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+										type: "number",
+										min: 0,
+										value: priceMin,
+										onChange: (e) => setPriceMin(e.target.value ? Number(e.target.value) : ""),
+										placeholder: "Min",
+										className: "w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-xs text-muted-foreground",
+										children: "–"
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
+										type: "number",
+										min: 0,
+										value: priceMax,
+										onChange: (e) => setPriceMax(e.target.value ? Number(e.target.value) : ""),
+										placeholder: "Max",
+										className: "w-full rounded-lg border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+									})
+								]
+							})]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
+							className: "mb-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground",
+							children: "Amenities"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "flex flex-wrap gap-1.5",
+							children: HOTEL_AMENITIES.map((amenity) => {
+								const checked = amenityFilters.includes(amenity);
+								return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+									type: "button",
+									onClick: () => toggleAmenity(amenity),
+									className: cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-[11px] font-semibold transition-colors", checked ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"),
+									children: amenity
+								}, amenity);
+							})
+						})] }),
+						activeFilterCount > 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+							onClick: clearAllFilters,
+							className: "mt-5 w-full rounded-xl border border-border py-2.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+							children: "Clear All Filters"
+						})
+					]
+				})
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex-1",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "mb-4 flex items-center justify-between",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						className: "text-sm text-muted-foreground",
+						children: loading ? "Loading hotels..." : `${filtered.length} hotel${filtered.length !== 1 ? "s" : ""} found`
+					})
+				}), loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex items-center justify-center py-20",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" })
+				}) : filtered.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Reveal, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "rounded-3xl border border-dashed border-border bg-card px-6 py-16 text-center",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							className: "mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-muted",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Search, {
+								size: 28,
+								className: "text-muted-foreground"
+							})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							className: "font-heading text-lg font-bold text-foreground",
+							children: emptyMessage
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							className: "mt-2 text-sm text-muted-foreground",
+							children: "Try adjusting your filters or clearing them to see all available hotels."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+							onClick: clearAllFilters,
+							className: "mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-cta transition-transform hover:scale-[1.02]",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { size: 16 }), "Clear All Filters"]
+						})
+					]
+				}) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "grid gap-5 sm:grid-cols-2 xl:grid-cols-3",
+					children: filtered.map((hotel, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Reveal, {
+						delay: index * 60,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HotelCard, { hotel })
+					}, hotel.id))
+				})]
+			})]
+		})]
+	})] });
+}
+function HotelCard({ hotel }) {
+	const is5Star = hotel.starRating === 5;
+	const waMsg = `Hi DillKash Kashmir, I'm interested in booking a stay at "${hotel.name}" in ${hotel.location}. Please share availability and rates.`;
+	const imagesList = (hotel.images && hotel.images.length > 0 ? hotel.images.map((img) => resolveImageUrl(img)) : ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"]).filter(Boolean);
+	const hasMultipleImages = imagesList.length > 1;
+	const [currentIndex, setCurrentIndex] = (0, import_react.useState)(0);
+	const touchStartX = (0, import_react.useRef)(null);
+	const touchEndX = (0, import_react.useRef)(null);
+	const handlePrev = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setCurrentIndex((prev) => prev === 0 ? imagesList.length - 1 : prev - 1);
+	};
+	const handleNext = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setCurrentIndex((prev) => prev === imagesList.length - 1 ? 0 : prev + 1);
+	};
+	const handleDotClick = (index, e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		setCurrentIndex(index);
+	};
+	const handleTouchStart = (e) => {
+		touchStartX.current = e.touches[0].clientX;
+		touchEndX.current = null;
+	};
+	const handleTouchMove = (e) => {
+		touchEndX.current = e.touches[0].clientX;
+	};
+	const handleTouchEnd = (e) => {
+		if (!touchStartX.current || !touchEndX.current) return;
+		const diff = touchStartX.current - touchEndX.current;
+		if (diff > 40) {
+			e.stopPropagation();
+			setCurrentIndex((prev) => prev === imagesList.length - 1 ? 0 : prev + 1);
+		} else if (diff < -40) {
+			e.stopPropagation();
+			setCurrentIndex((prev) => prev === 0 ? imagesList.length - 1 : prev - 1);
+		}
+		touchStartX.current = null;
+		touchEndX.current = null;
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		className: "card-hover group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "relative aspect-[16/10] overflow-hidden bg-muted select-none",
+			onTouchStart: handleTouchStart,
+			onTouchMove: handleTouchMove,
+			onTouchEnd: handleTouchEnd,
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					className: "flex h-full w-full transition-transform duration-300 ease-out",
+					style: { transform: `translateX(-${currentIndex * 100}%)` },
+					children: imagesList.map((imgSrc, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "relative h-full w-full flex-shrink-0",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							src: resolveImageUrl(imgSrc),
+							alt: `${hotel.name} - Photo ${idx + 1}`,
+							loading: idx === 0 ? "eager" : "lazy",
+							onError: (e) => {
+								e.currentTarget.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
+							},
+							className: "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+						})
+					}, `${hotel.slug}-img-${idx}`))
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/35" }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "absolute left-3 top-3 z-20 flex flex-wrap items-center gap-1.5",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: cn("flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold shadow-md backdrop-blur-sm", is5Star ? "bg-gradient-to-r from-amber-500 to-amber-400 text-amber-950" : "bg-white/90 text-slate-800"),
+						children: [Array.from({ length: hotel.starRating }, (_, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Star, {
+							size: 11,
+							className: is5Star ? "fill-amber-900 text-amber-900" : "fill-amber-400 text-amber-400"
+						}, i)), is5Star && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "ml-0.5",
+							children: "LUXURY"
+						})]
+					}), hotel.featured && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold text-white shadow-md",
+						children: "FEATURED"
+					})]
+				}),
+				hasMultipleImages && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "absolute right-3 top-3 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white/90 backdrop-blur shadow-sm",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Images, { size: 11 }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
+						currentIndex + 1,
+						"/",
+						imagesList.length
+					] })]
+				}),
+				hasMultipleImages && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						type: "button",
+						onClick: handlePrev,
+						"aria-label": "Previous photo",
+						className: "absolute left-2.5 top-1/2 z-20 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-all duration-200 hover:bg-black/80 hover:scale-110 opacity-0 group-hover:opacity-100 sm:opacity-0 focus:opacity-100",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, { size: 18 })
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						type: "button",
+						onClick: handleNext,
+						"aria-label": "Next photo",
+						className: "absolute right-2.5 top-1/2 z-20 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-all duration-200 hover:bg-black/80 hover:scale-110 opacity-0 group-hover:opacity-100 sm:opacity-0 focus:opacity-100",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, { size: 18 })
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5",
+						children: imagesList.map((_, dotIdx) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+							type: "button",
+							onClick: (e) => handleDotClick(dotIdx, e),
+							"aria-label": `Go to slide ${dotIdx + 1}`,
+							className: `rounded-full transition-all duration-300 ${currentIndex === dotIdx ? "h-1.5 w-5 bg-white shadow-md" : "h-1.5 w-1.5 bg-white/55 hover:bg-white/90 hover:scale-125"}`
+						}, `dot-${dotIdx}`))
+					})
+				] }),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "pointer-events-none absolute bottom-0 inset-x-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-4 pb-2.5 pt-8",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-lg font-extrabold text-white",
+						children: formatPKR(hotel.pricePerNight)
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						className: "text-xs text-white/70",
+						children: " / night"
+					})]
+				})
+			]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			className: "flex flex-1 flex-col p-4",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+					className: "font-heading text-base font-bold leading-snug text-foreground line-clamp-1",
+					children: hotel.name
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mt-1.5 flex items-center gap-1 text-xs text-muted-foreground",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
+						size: 13,
+						className: "shrink-0 text-primary"
+					}), hotel.location]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "mt-3 flex flex-wrap gap-1",
+					children: [hotel.amenities.slice(0, 4).map((amenity) => {
+						const Icon = amenityIcons[amenity] || Sparkles;
+						return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+							className: "inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, { size: 10 }), amenity]
+						}, amenity);
+					}), hotel.amenities.length > 4 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+						className: "rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground",
+						children: [
+							"+",
+							hotel.amenities.length - 4,
+							" more"
+						]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					className: "mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-2",
+					children: hotel.description
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+					href: whatsappLink(waMsg),
+					target: "_blank",
+					rel: "noopener noreferrer",
+					className: "mt-auto pt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-700 hover:shadow-md active:scale-[0.98]",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, { size: 16 }), "Book via WhatsApp"]
+				})
+			]
+		})]
+	});
+}
+//#endregion
+export { HotelsPage as component };

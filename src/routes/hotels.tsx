@@ -28,6 +28,7 @@ import {
 import { formatPKR, whatsappLink } from "@/data/site";
 import { Reveal } from "@/components/site/Reveal";
 import { cn } from "@/lib/utils";
+import { resolveImageUrl } from "@/lib/resolveImage";
 import heroImg from "@/assets/hero-kashmir.jpg";
 
 /* ─────────────────────── Route ─────────────────────── */
@@ -465,7 +466,7 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
   const waMsg = `Hi DillKash Kashmir, I'm interested in booking a stay at "${hotel.name}" in ${hotel.location}. Please share availability and rates.`;
 
   const imagesList = (hotel.images && hotel.images.length > 0
-    ? hotel.images
+    ? hotel.images.map((img) => resolveImageUrl(img))
     : ["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"]
   ).filter(Boolean);
 
@@ -535,9 +536,13 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
           {imagesList.map((imgSrc, idx) => (
             <div key={`${hotel.slug}-img-${idx}`} className="relative h-full w-full flex-shrink-0">
               <img
-                src={imgSrc}
+                src={resolveImageUrl(imgSrc)}
                 alt={`${hotel.name} - Photo ${idx + 1}`}
                 loading={idx === 0 ? "eager" : "lazy"}
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src =
+                    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
+                }}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
