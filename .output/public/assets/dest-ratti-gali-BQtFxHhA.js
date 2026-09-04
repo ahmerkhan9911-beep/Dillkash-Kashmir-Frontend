@@ -1,1 +1,0 @@
-var e=`/assets/dest-ratti-gali-BXSOR1Xp.jpg`;export{e as t};

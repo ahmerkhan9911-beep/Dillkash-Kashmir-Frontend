@@ -1,1 +1,0 @@
-var e=[`Muzaffarabad`,`Neelum Valley`,`Arang Kel`,`Sharda`,`Taobat`,`Keran`,`Kutton`,`Pir Chinasi`],t=[`WiFi`,`Heater`,`River View`,`Parking`,`Complimentary Breakfast`,`Room Service`,`Hot Water`,`Generator Backup`],n=[5,4,3,2,1];export{e as n,n as r,t};
