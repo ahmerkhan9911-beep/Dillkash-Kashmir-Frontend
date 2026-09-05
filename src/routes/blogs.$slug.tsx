@@ -111,9 +111,9 @@ function BlogPostPage() {
   const gallery = parseGallery((blog as any)?.gallery);
 
   return (
-    <article className="pb-24 pt-32">
+    <article className="pb-24 pt-32 overflow-x-hidden">
       {/* Header */}
-      <header className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+      <header className="mx-auto max-w-5xl px-4 text-center sm:px-6">
         <div className="mb-6 flex items-center justify-center gap-4 text-sm font-semibold text-muted-foreground">
           <span className="flex items-center gap-1.5">
             <Calendar size={16} className="text-primary" />
@@ -147,10 +147,10 @@ function BlogPostPage() {
       )}
 
       {/* Content */}
-      <div className="mx-auto mt-12 max-w-3xl px-4 sm:px-6">
+      <div className="mx-auto mt-10 w-full max-w-5xl px-4 sm:px-6">
         <div
-          className="prose prose-lg max-w-none text-foreground prose-headings:font-heading prose-headings:font-bold prose-a:text-primary prose-img:rounded-2xl"
-          dangerouslySetInnerHTML={{ __html: (blog as any).content }}
+          className="prose prose-lg md:prose-xl max-w-none !max-w-none w-full break-words text-foreground dark:prose-invert prose-headings:font-heading prose-headings:font-bold prose-a:text-primary hover:prose-a:underline prose-a:break-all prose-img:rounded-2xl prose-img:max-w-full prose-pre:overflow-x-auto"
+          dangerouslySetInnerHTML={{ __html: (blog as any).content || "" }}
         />
 
         {/* ── Gallery Grid ─────────────────────────────────────────── */}
