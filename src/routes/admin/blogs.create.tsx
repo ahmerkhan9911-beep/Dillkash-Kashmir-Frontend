@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback, useEffect } from "react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { GalleryUploader } from "@/components/admin/GalleryUploader";
 import { Loader2, Save, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/services/api";
@@ -21,6 +22,7 @@ function CreateBlogPage() {
   const [author, setAuthor] = useState("Admin");
   const [content, setContent] = useState("");
   const [coverImage, setCoverImage] = useState("");
+  const [gallery, setGallery] = useState<string[]>([]);
   const [QuillEditor, setQuillEditor] = useState<any>(null);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ function CreateBlogPage() {
 
     setLoading(true);
     try {
-      await api("/api/blogs", {
+      await api("/blogs", {
         method: "POST",
         body: {
           title,
@@ -50,12 +52,13 @@ function CreateBlogPage() {
           author,
           content,
           cover_image: coverImage,
+          gallery,
         },
       });
       toast.success("Blog created successfully!");
       navigate({ to: "/admin/blogs" });
     } catch (err: any) {
-      toast.error(err.response?.data?.error || "Failed to create blog.");
+      toast.error(err.message || "Failed to create blog.");
     } finally {
       setLoading(false);
     }
@@ -142,6 +145,20 @@ function CreateBlogPage() {
               />
             </div>
           </div>
+        </fieldset>
+
+        <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
+          <legend className="px-2 font-heading text-base font-bold text-foreground">
+            Gallery Images
+          </legend>
+          <p className="mb-3 mt-1 text-xs text-muted-foreground">
+            Upload additional photos shown in a grid at the bottom of the post.
+          </p>
+          <GalleryUploader
+            value={gallery}
+            onChange={setGallery}
+            onUploadingChange={handleUploadingChange}
+          />
         </fieldset>
 
         <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">

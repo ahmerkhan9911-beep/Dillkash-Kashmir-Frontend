@@ -39,12 +39,16 @@ export async function api<T = unknown>(
 ): Promise<T> {
   const { method = "GET", body, headers = {} } = options;
 
-  const token = getToken();
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
   const fetchHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
     ...headers,
   };
 
+  if (!isFormData && !fetchHeaders["Content-Type"]) {
+    fetchHeaders["Content-Type"] = "application/json";
+  }
+
+  const token = getToken();
   if (token) {
     fetchHeaders["Authorization"] = `Bearer ${token}`;
   }
@@ -53,7 +57,10 @@ export async function api<T = unknown>(
     method,
     headers: fetchHeaders,
   };
-  if (body !== undefined) {
+
+  if (isFormData) {
+    reqInit.body = body as BodyInit;
+  } else if (body !== undefined) {
     reqInit.body = JSON.stringify(body);
   }
 

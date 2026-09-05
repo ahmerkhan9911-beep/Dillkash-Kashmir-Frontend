@@ -23,7 +23,7 @@ function AdminBlogsIndex() {
       toast.success("Blog post deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.error || "Failed to delete blog post");
+      toast.error(error.message || "Failed to delete blog post");
     },
   });
 

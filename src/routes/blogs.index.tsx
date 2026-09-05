@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { api } from "@/services/api";
 import { Reveal } from "@/components/site/Reveal";
 import { images } from "@/data/site";
+import { resolveImageUrl } from "@/lib/resolveImage";
 
 export const Route = createFileRoute("/blogs/")({
   head: () => ({
@@ -62,7 +63,7 @@ function BlogsPage() {
                   <div className="relative aspect-video w-full overflow-hidden bg-muted">
                     {blog.cover_image ? (
                       <img
-                        src={blog.cover_image}
+                        src={resolveImageUrl(blog.cover_image)}
                         alt={blog.title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />

@@ -46,29 +46,43 @@ const staticAssetMap: Record<string, string> = {
 export function resolveImageUrl(url: string | null | undefined): string {
   if (!url) return "";
 
+  const trimmed = String(url).trim();
+  if (!trimmed) return "";
+
   // Blob URLs (local preview) and data URLs
-  if (url.startsWith("blob:") || url.startsWith("data:")) {
-    return url;
+  if (trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
+    return trimmed;
   }
 
   // Already fully qualified HTTP / HTTPS
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
   }
+
+  // Bundled local static assets (/assets/...)
+  if (staticAssetMap[trimmed]) {
+    return staticAssetMap[trimmed];
+  }
+
+  const rawUrl = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
+    ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
+    : "https://api.dillkashkashmir.com";
+  const base = rawUrl.replace(/\/api$/, "");
 
   // Uploaded files hosted by Express API server
-  if (url.startsWith("/uploads/")) {
-    const rawUrl = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
-      ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
-      : "https://api.dillkashkashmir.com";
-    const base = rawUrl.replace(/\/api$/, "");
-    return `${base}${url}`;
+  if (trimmed.startsWith("/uploads/")) {
+    return `${base}${trimmed}`;
   }
 
-  // Static bundled asset
-  if (staticAssetMap[url]) {
-    return staticAssetMap[url];
+  if (trimmed.startsWith("uploads/")) {
+    return `${base}/${trimmed}`;
   }
 
-  return url;
+  if (trimmed.startsWith("/")) {
+    return `${base}${trimmed}`;
+  }
+
+  // Plain filename without leading slash (e.g. "imageName.jpg")
+  return `${base}/uploads/${trimmed}`;
 }
+

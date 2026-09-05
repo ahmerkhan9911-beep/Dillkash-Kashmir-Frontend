@@ -107,6 +107,7 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
       await Promise.all(
         valid.map(async (file, i) => {
           const thumb = thumbs[i];
+          if (!thumb) return;
           notifyParent(thumb.id, false);
           try {
             const url = await uploadImage(file);
