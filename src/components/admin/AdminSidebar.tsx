@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { BarChart3, Package, LayoutDashboard, LogOut, ChevronLeft, Menu, MapPin, Hotel, UserCheck } from "lucide-react";
+import { BarChart3, Package, LayoutDashboard, LogOut, ChevronLeft, Menu, MapPin, Hotel, UserCheck, FileText } from "lucide-react";
 import logoHorizontal from "@/assets/dillkash-logo-horizontal.png";
 import logoIcon from "@/assets/dillkash-logo-icon.png";
 import { useAuth } from "@/context/AuthContext";
@@ -12,6 +12,7 @@ const links = [
   { to: "/admin/hotels", label: "Hotels", icon: Hotel, exact: false },
   { to: "/admin/destinations", label: "Destinations", icon: MapPin, exact: false },
   { to: "/admin/guides", label: "Tour Guides", icon: UserCheck, exact: false },
+  { to: "/admin/blogs", label: "Blogs & Updates", icon: FileText, exact: false },
 ] as const;
 
 export function AdminSidebar() {

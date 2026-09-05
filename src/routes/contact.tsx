@@ -100,9 +100,9 @@ function ContactPage() {
                     <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-cta">
                       <MapPin size={26} />
                     </span>
-                    <p className="mt-3 font-heading text-sm font-bold text-foreground">Johar Town, Lahore</p>
+                    <p className="mt-3 font-heading text-sm font-bold text-foreground">Dharampura, Lahore</p>
                     <a
-                      href="https://maps.google.com/?q=Johar+Town+Lahore"
+                      href="https://maps.app.goo.gl/WSEg6bbrK3Wd75MU8"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="mt-1 inline-block text-xs font-bold text-primary hover:underline"

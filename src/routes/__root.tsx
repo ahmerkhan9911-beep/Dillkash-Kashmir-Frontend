@@ -16,6 +16,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
+import { Toaster } from "sonner";
 
 function NotFoundComponent() {
   return (
@@ -147,6 +148,7 @@ function RootComponent() {
         </main>
         {!isAdmin && !isAuth && <Footer />}
         {!isAdmin && !isAuth && <WhatsAppFloat />}
+        <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </AuthProvider>
   );

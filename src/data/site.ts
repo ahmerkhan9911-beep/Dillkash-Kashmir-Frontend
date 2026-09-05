@@ -14,13 +14,13 @@ import muzaffarabad from "@/assets/dest-muzaffarabad.jpg";
 export const site = {
   name: "DillKash Kashmir",
   tagline: "Experience Majestic Kashmir — Tours Departing Weekly from Lahore!",
-  phone: "+92 300 1234567",
-  phoneHref: "tel:+923001234567",
-  whatsapp: "923001234567",
+  phone: "+92 0321 7057764",
+  phoneHref: "tel:+923217057764",
+  whatsapp: "923217057764",
   whatsappMessage:
     "Hi DillKash Kashmir, I want details regarding Kashmir Tour departing from Lahore.",
-  email: "info@dillkashkashmir.com",
-  address: "Main Boulevard, Johar Town, Lahore, Pakistan",
+  email: "dillkaskkashmir@gmail.com",
+  address: "Habib bank, 240 Allama Iqbal Rd, near Mustafa abad, Dharampura, Lahore, Pakistan",
   hours: "Mon – Sun: 9:00 AM – 10:00 PM",
 };
 

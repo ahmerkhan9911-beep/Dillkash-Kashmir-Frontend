@@ -19,10 +19,15 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as PackagesRouteImport } from './routes/packages'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminBlogsRouteImport } from './routes/admin/blogs'
 import { Route as AdminHotelsRouteImport } from './routes/admin/hotels'
 import { Route as AdminPackagesRouteImport } from './routes/admin/packages'
+import { Route as BlogsIndexRouteImport } from './routes/blogs.index'
+import { Route as BlogsSlugRouteImport } from './routes/blogs.$slug'
 import { Route as PackagesIndexRouteImport } from './routes/packages.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
+import { Route as AdminBlogsIndexRouteImport } from './routes/admin/blogs.index'
+import { Route as AdminBlogsCreateRouteImport } from './routes/admin/blogs.create'
 import { Route as AdminDestinationsIndexRouteImport } from './routes/admin/destinations.index'
 import { Route as AdminDestinationsCreateRouteImport } from './routes/admin/destinations.create'
 import { Route as AdminGuidesIndexRouteImport } from './routes/admin/guides.index'
@@ -30,6 +35,7 @@ import { Route as AdminHotelsIndexRouteImport } from './routes/admin/hotels.inde
 import { Route as AdminHotelsCreateRouteImport } from './routes/admin/hotels.create'
 import { Route as AdminPackagesIndexRouteImport } from './routes/admin/packages.index'
 import { Route as AdminPackagesCreateRouteImport } from './routes/admin/packages.create'
+import { Route as AdminBlogsIdEditRouteImport } from './routes/admin/blogs.$id.edit'
 import { Route as AdminDestinationsIdEditRouteImport } from './routes/admin/destinations.$id.edit'
 import { Route as AdminHotelsIdEditRouteImport } from './routes/admin/hotels.$id.edit'
 import { Route as AdminPackagesIdEditRouteImport } from './routes/admin/packages.$id.edit'
@@ -84,6 +90,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBlogsRoute = AdminBlogsRouteImport.update({
+  id: '/blogs',
+  path: '/blogs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminHotelsRoute = AdminHotelsRouteImport.update({
   id: '/hotels',
   path: '/hotels',
@@ -94,6 +105,16 @@ const AdminPackagesRoute = AdminPackagesRouteImport.update({
   path: '/packages',
   getParentRoute: () => AdminRoute,
 } as any)
+const BlogsIndexRoute = BlogsIndexRouteImport.update({
+  id: '/blogs/',
+  path: '/blogs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogsSlugRoute = BlogsSlugRouteImport.update({
+  id: '/blogs/$slug',
+  path: '/blogs/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PackagesIndexRoute = PackagesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -103,6 +124,16 @@ const PackagesSlugRoute = PackagesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => PackagesRoute,
+} as any)
+const AdminBlogsIndexRoute = AdminBlogsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminBlogsRoute,
+} as any)
+const AdminBlogsCreateRoute = AdminBlogsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => AdminBlogsRoute,
 } as any)
 const AdminDestinationsIndexRoute = AdminDestinationsIndexRouteImport.update({
   id: '/destinations/',
@@ -139,6 +170,11 @@ const AdminPackagesCreateRoute = AdminPackagesCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AdminPackagesRoute,
 } as any)
+const AdminBlogsIdEditRoute = AdminBlogsIdEditRouteImport.update({
+  id: '/$id/edit',
+  path: '/$id/edit',
+  getParentRoute: () => AdminBlogsRoute,
+} as any)
 const AdminDestinationsIdEditRoute = AdminDestinationsIdEditRouteImport.update({
   id: '/destinations/$id/edit',
   path: '/destinations/$id/edit',
@@ -165,18 +201,24 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRouteWithChildren
   '/signup': typeof SignupRoute
+  '/admin/blogs': typeof AdminBlogsRouteWithChildren
   '/admin/hotels': typeof AdminHotelsRouteWithChildren
   '/admin/packages': typeof AdminPackagesRouteWithChildren
+  '/blogs/$slug': typeof BlogsSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/blogs/': typeof BlogsIndexRoute
   '/packages/': typeof PackagesIndexRoute
+  '/admin/blogs/create': typeof AdminBlogsCreateRoute
   '/admin/destinations/create': typeof AdminDestinationsCreateRoute
   '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
+  '/admin/blogs/': typeof AdminBlogsIndexRoute
   '/admin/destinations/': typeof AdminDestinationsIndexRoute
   '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
+  '/admin/blogs/$id/edit': typeof AdminBlogsIdEditRoute
   '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
   '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
   '/admin/packages/$id/edit': typeof AdminPackagesIdEditRoute
@@ -189,16 +231,21 @@ export interface FileRoutesByTo {
   '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/blogs/$slug': typeof BlogsSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/blogs': typeof BlogsIndexRoute
   '/packages': typeof PackagesIndexRoute
+  '/admin/blogs/create': typeof AdminBlogsCreateRoute
   '/admin/destinations/create': typeof AdminDestinationsCreateRoute
   '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
+  '/admin/blogs': typeof AdminBlogsIndexRoute
   '/admin/destinations': typeof AdminDestinationsIndexRoute
   '/admin/guides': typeof AdminGuidesIndexRoute
   '/admin/hotels': typeof AdminHotelsIndexRoute
   '/admin/packages': typeof AdminPackagesIndexRoute
+  '/admin/blogs/$id/edit': typeof AdminBlogsIdEditRoute
   '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
   '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
   '/admin/packages/$id/edit': typeof AdminPackagesIdEditRoute
@@ -214,18 +261,24 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/packages': typeof PackagesRouteWithChildren
   '/signup': typeof SignupRoute
+  '/admin/blogs': typeof AdminBlogsRouteWithChildren
   '/admin/hotels': typeof AdminHotelsRouteWithChildren
   '/admin/packages': typeof AdminPackagesRouteWithChildren
+  '/blogs/$slug': typeof BlogsSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/blogs/': typeof BlogsIndexRoute
   '/packages/': typeof PackagesIndexRoute
+  '/admin/blogs/create': typeof AdminBlogsCreateRoute
   '/admin/destinations/create': typeof AdminDestinationsCreateRoute
   '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
+  '/admin/blogs/': typeof AdminBlogsIndexRoute
   '/admin/destinations/': typeof AdminDestinationsIndexRoute
   '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
+  '/admin/blogs/$id/edit': typeof AdminBlogsIdEditRoute
   '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
   '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
   '/admin/packages/$id/edit': typeof AdminPackagesIdEditRoute
@@ -242,18 +295,24 @@ export interface FileRouteTypes {
     | '/login'
     | '/packages'
     | '/signup'
+    | '/admin/blogs'
     | '/admin/hotels'
     | '/admin/packages'
+    | '/blogs/$slug'
     | '/packages/$slug'
     | '/admin/'
+    | '/blogs/'
     | '/packages/'
+    | '/admin/blogs/create'
     | '/admin/destinations/create'
     | '/admin/hotels/create'
     | '/admin/packages/create'
+    | '/admin/blogs/'
     | '/admin/destinations/'
     | '/admin/guides/'
     | '/admin/hotels/'
     | '/admin/packages/'
+    | '/admin/blogs/$id/edit'
     | '/admin/destinations/$id/edit'
     | '/admin/hotels/$id/edit'
     | '/admin/packages/$id/edit'
@@ -266,16 +325,21 @@ export interface FileRouteTypes {
     | '/hotels'
     | '/login'
     | '/signup'
+    | '/blogs/$slug'
     | '/packages/$slug'
     | '/admin'
+    | '/blogs'
     | '/packages'
+    | '/admin/blogs/create'
     | '/admin/destinations/create'
     | '/admin/hotels/create'
     | '/admin/packages/create'
+    | '/admin/blogs'
     | '/admin/destinations'
     | '/admin/guides'
     | '/admin/hotels'
     | '/admin/packages'
+    | '/admin/blogs/$id/edit'
     | '/admin/destinations/$id/edit'
     | '/admin/hotels/$id/edit'
     | '/admin/packages/$id/edit'
@@ -290,18 +354,24 @@ export interface FileRouteTypes {
     | '/login'
     | '/packages'
     | '/signup'
+    | '/admin/blogs'
     | '/admin/hotels'
     | '/admin/packages'
+    | '/blogs/$slug'
     | '/packages/$slug'
     | '/admin/'
+    | '/blogs/'
     | '/packages/'
+    | '/admin/blogs/create'
     | '/admin/destinations/create'
     | '/admin/hotels/create'
     | '/admin/packages/create'
+    | '/admin/blogs/'
     | '/admin/destinations/'
     | '/admin/guides/'
     | '/admin/hotels/'
     | '/admin/packages/'
+    | '/admin/blogs/$id/edit'
     | '/admin/destinations/$id/edit'
     | '/admin/hotels/$id/edit'
     | '/admin/packages/$id/edit'
@@ -317,6 +387,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PackagesRoute: typeof PackagesRouteWithChildren
   SignupRoute: typeof SignupRoute
+  BlogsSlugRoute: typeof BlogsSlugRoute
+  BlogsIndexRoute: typeof BlogsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -391,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/blogs': {
+      id: '/admin/blogs'
+      path: '/blogs'
+      fullPath: '/admin/blogs'
+      preLoaderRoute: typeof AdminBlogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/hotels': {
       id: '/admin/hotels'
       path: '/hotels'
@@ -405,6 +484,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPackagesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/blogs/': {
+      id: '/blogs/'
+      path: '/blogs'
+      fullPath: '/blogs/'
+      preLoaderRoute: typeof BlogsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blogs/$slug': {
+      id: '/blogs/$slug'
+      path: '/blogs/$slug'
+      fullPath: '/blogs/$slug'
+      preLoaderRoute: typeof BlogsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/packages/': {
       id: '/packages/'
       path: '/'
@@ -418,6 +511,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/packages/$slug'
       preLoaderRoute: typeof PackagesSlugRouteImport
       parentRoute: typeof PackagesRoute
+    }
+    '/admin/blogs/': {
+      id: '/admin/blogs/'
+      path: '/'
+      fullPath: '/admin/blogs/'
+      preLoaderRoute: typeof AdminBlogsIndexRouteImport
+      parentRoute: typeof AdminBlogsRoute
+    }
+    '/admin/blogs/create': {
+      id: '/admin/blogs/create'
+      path: '/create'
+      fullPath: '/admin/blogs/create'
+      preLoaderRoute: typeof AdminBlogsCreateRouteImport
+      parentRoute: typeof AdminBlogsRoute
     }
     '/admin/destinations/': {
       id: '/admin/destinations/'
@@ -468,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPackagesCreateRouteImport
       parentRoute: typeof AdminPackagesRoute
     }
+    '/admin/blogs/$id/edit': {
+      id: '/admin/blogs/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/admin/blogs/$id/edit'
+      preLoaderRoute: typeof AdminBlogsIdEditRouteImport
+      parentRoute: typeof AdminBlogsRoute
+    }
     '/admin/destinations/$id/edit': {
       id: '/admin/destinations/$id/edit'
       path: '/destinations/$id/edit'
@@ -491,6 +605,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminBlogsRouteChildren {
+  AdminBlogsCreateRoute: typeof AdminBlogsCreateRoute
+  AdminBlogsIndexRoute: typeof AdminBlogsIndexRoute
+  AdminBlogsIdEditRoute: typeof AdminBlogsIdEditRoute
+}
+
+const AdminBlogsRouteChildren: AdminBlogsRouteChildren = {
+  AdminBlogsCreateRoute: AdminBlogsCreateRoute,
+  AdminBlogsIndexRoute: AdminBlogsIndexRoute,
+  AdminBlogsIdEditRoute: AdminBlogsIdEditRoute,
+}
+
+const AdminBlogsRouteWithChildren = AdminBlogsRoute._addFileChildren(
+  AdminBlogsRouteChildren,
+)
 
 interface AdminHotelsRouteChildren {
   AdminHotelsCreateRoute: typeof AdminHotelsCreateRoute
@@ -525,6 +655,7 @@ const AdminPackagesRouteWithChildren = AdminPackagesRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminBlogsRoute: typeof AdminBlogsRouteWithChildren
   AdminHotelsRoute: typeof AdminHotelsRouteWithChildren
   AdminPackagesRoute: typeof AdminPackagesRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -535,6 +666,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBlogsRoute: AdminBlogsRouteWithChildren,
   AdminHotelsRoute: AdminHotelsRouteWithChildren,
   AdminPackagesRoute: AdminPackagesRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
@@ -570,6 +702,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PackagesRoute: PackagesRouteWithChildren,
   SignupRoute: SignupRoute,
+  BlogsSlugRoute: BlogsSlugRoute,
+  BlogsIndexRoute: BlogsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

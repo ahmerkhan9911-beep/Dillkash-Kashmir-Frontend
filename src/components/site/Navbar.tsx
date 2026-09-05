@@ -14,6 +14,7 @@ const navLinks = [
   { to: "/packages", label: "Destinations", hash: "destinations" },
   { to: "/custom-tour", label: "Custom Tour" },
   { to: "/about", label: "About Us" },
+  { to: "/blogs", label: "Blog" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -252,6 +253,13 @@ export function Navbar() {
             className="rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
           >
             About Us
+          </Link>
+          <Link
+            to="/blogs"
+            onClick={() => setOpen(false)}
+            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+          >
+            Blog
           </Link>
           <Link
             to="/contact"
