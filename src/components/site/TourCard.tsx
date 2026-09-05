@@ -219,7 +219,7 @@ export function TourCard({ tour, onBook }: TourCardProps) {
               onBook
                 ? onBook(tour)
                 : window.open(
-                    whatsappLink(`Hi Al Kareem Travel! I want to book: ${tour.title}`),
+                    whatsappLink(`Hi DillKash Kashmir! I want to book: ${tour.title}`),
                     "_blank",
                     "noopener",
                   )

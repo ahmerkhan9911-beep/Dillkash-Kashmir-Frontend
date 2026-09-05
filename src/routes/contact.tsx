@@ -9,13 +9,13 @@ import { WhatsAppIcon } from "@/components/site/Navbar";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Us — Al Kareem Travel & Tours, Lahore" },
+      { title: "Contact Us — DillKash Kashmir, Lahore" },
       {
         name: "description",
         content:
-          "Get in touch with Al Kareem Travel & Tours in Lahore. Call, WhatsApp or visit our office to plan your Kashmir tour — open 7 days a week.",
+          "Get in touch with DillKash Kashmir in Lahore. Call, WhatsApp or visit our office to plan your Kashmir tour — open 7 days a week.",
       },
-      { property: "og:title", content: "Contact Us — Al Kareem Travel & Tours, Lahore" },
+      { property: "og:title", content: "Contact Us — DillKash Kashmir, Lahore" },
       {
         property: "og:description",
         content:

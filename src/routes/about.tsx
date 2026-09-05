@@ -24,13 +24,13 @@ import { SectionHeader } from "@/components/site/SectionHeader";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About Us — Al Kareem Travel & Tours" },
+      { title: "About Us — DillKash Kashmir" },
       {
         name: "description",
         content:
           "Lahore-based travel company specializing in Azad Jammu & Kashmir tours. Meet our fleet, safety policies and the team behind thousands of happy Kashmir journeys.",
       },
-      { property: "og:title", content: "About Us — Al Kareem Travel & Tours" },
+      { property: "og:title", content: "About Us — DillKash Kashmir" },
       {
         property: "og:description",
         content:
@@ -77,7 +77,7 @@ function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/70" />
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-36 text-center sm:px-6">
           <h1 className="font-heading text-4xl font-extrabold text-white text-balance sm:text-5xl">
-            About Al Kareem Travel & Tours
+            About DillKash Kashmir
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-white/85">
             A Lahore-based team of Kashmir specialists, running safe and
@@ -106,7 +106,7 @@ function AboutPage() {
               align="left"
               eyebrow="Our Story"
               title="Born in Lahore, at Home in Kashmir"
-              subtitle="Al Kareem Travel & Tours started with a single coaster and a simple promise: make the paradise of Azad Jammu & Kashmir accessible to every family in Lahore."
+              subtitle="DillKash Kashmir started with a single coaster and a simple promise: make the paradise of Azad Jammu & Kashmir accessible to every family in Lahore."
             />
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
               Today we run weekly departures to Neelum Valley, Arang Kel, Ratti

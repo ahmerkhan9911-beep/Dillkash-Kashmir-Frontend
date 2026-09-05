@@ -150,7 +150,7 @@ export function Footer() {
       </div>
       <div className="border-t border-white/10">
         <p className="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-primary-foreground/50 sm:px-6">
-          © 2026 Al Kareem Travel & Tours. All Rights Reserved.
+          © 2026 DillKash Kashmir. All Rights Reserved.
         </p>
       </div>
     </footer>

@@ -12,14 +12,14 @@ import keran from "@/assets/dest-keran.jpg";
 import muzaffarabad from "@/assets/dest-muzaffarabad.jpg";
 
 export const site = {
-  name: "Al Kareem Travel & Tours",
+  name: "DillKash Kashmir",
   tagline: "Experience Majestic Kashmir — Tours Departing Weekly from Lahore!",
   phone: "+92 300 1234567",
   phoneHref: "tel:+923001234567",
   whatsapp: "923001234567",
   whatsappMessage:
-    "Hi Al Kareem Travel, I want details regarding Kashmir Tour departing from Lahore.",
-  email: "info@alkareemtravel.pk",
+    "Hi DillKash Kashmir, I want details regarding Kashmir Tour departing from Lahore.",
+  email: "info@dillkashkashmir.com",
   address: "Main Boulevard, Johar Town, Lahore, Pakistan",
   hours: "Mon – Sun: 9:00 AM – 10:00 PM",
 };
@@ -428,7 +428,7 @@ export const reviews: Review[] = [
     initials: "HJ",
     rating: 5,
     review:
-      "Ratti Gali has been on my list for years. The 4x4 ride, the camping, the lake at sunrise — Al Kareem nailed every detail. Worth every rupee.",
+      "Ratti Gali has been on my list for years. The 4x4 ride, the camping, the lake at sunrise — DillKash Kashmir nailed every detail. Worth every rupee.",
     trip: "7-Day Ultimate Adventure & Lakes Tour",
   },
   {

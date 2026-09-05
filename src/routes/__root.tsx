@@ -82,14 +82,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Al Kareem Travel & Tours — Kashmir Tours from Lahore" },
+      { title: "DillKash Kashmir" },
       {
         name: "description",
         content:
           "Premium & budget-friendly Kashmir tour packages departing weekly from Lahore. Neelum Valley, Arang Kel, Ratti Gali, Sharda, Taobat & more with all-inclusive pricing.",
       },
-      { name: "author", content: "Al Kareem Travel & Tours" },
-      { property: "og:title", content: "Al Kareem Travel & Tours — Kashmir Tours from Lahore" },
+      { name: "author", content: "DillKash Kashmir" },
+      { property: "og:title", content: "DillKash Kashmir — Kashmir Tours from Lahore" },
       {
         property: "og:description",
         content:

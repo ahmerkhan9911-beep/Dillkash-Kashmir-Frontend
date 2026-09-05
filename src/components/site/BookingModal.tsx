@@ -73,7 +73,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
   };
 
   const whatsappBooking = () => {
-    const msg = `Hi Al Kareem Travel! I want to book: ${form.tour || "a Kashmir tour"}\nName: ${form.name}\nDate: ${form.date || "Flexible"}\nTravelers: ${form.adults} adults, ${form.kids} kids\nRoom: ${form.room}`;
+    const msg = `Hi DillKash Kashmir! I want to book: ${form.tour || "a Kashmir tour"}\nName: ${form.name}\nDate: ${form.date || "Flexible"}\nTravelers: ${form.adults} adults, ${form.kids} kids\nRoom: ${form.room}`;
     window.open(whatsappLink(msg), "_blank", "noopener");
   };
 

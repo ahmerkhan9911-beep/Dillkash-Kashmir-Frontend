@@ -41,13 +41,13 @@ import { getDestinations, type DestinationItem } from "@/services/destinations";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Al Kareem Travel & Tours — Kashmir Tours from Lahore" },
+      { title: "DillKash Kashmir — Kashmir Tours from Lahore" },
       {
         name: "description",
         content:
           "Experience Majestic Kashmir — weekly tours from Lahore to Neelum Valley, Arang Kel, Ratti Gali & beyond. All-inclusive packages, luxury transport, verified hotels.",
       },
-      { property: "og:title", content: "Al Kareem Travel & Tours — Kashmir Tours from Lahore" },
+      { property: "og:title", content: "DillKash Kashmir — Kashmir Tours from Lahore" },
       {
         property: "og:description",
         content:
@@ -88,7 +88,7 @@ function Hero({ onSearch }: { onSearch: (duration: string, type: string) => void
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
               Hassle-free, premium & budget-friendly tour packages to Neelum
-              Valley, Arang Kel, Ratti Gali & beyond with Al Kareem Travel & Tours.
+              Valley, Arang Kel, Ratti Gali & beyond with DillKash Kashmir.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
@@ -210,7 +210,7 @@ function WhyChooseUs() {
       <Reveal>
         <SectionHeader
           eyebrow="Why Choose Us"
-          title="Why Travel With Al Kareem Travel & Tours?"
+          title="Why Travel With DillKash Kashmir?"
           subtitle="We handle everything from Lahore pickup to Kashmir drop-off, so you can focus on the views."
         />
       </Reveal>
@@ -552,7 +552,7 @@ function LahoreDepartures() {
           />
           <div className="mt-8">
             <a
-              href={whatsappLink("Hi Al Kareem Travel! Please share the next departure availability from Lahore.")}
+              href={whatsappLink("Hi DillKash Kashmir! Please share the next departure availability from Lahore.")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-105"

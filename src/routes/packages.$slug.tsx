@@ -31,15 +31,15 @@ export const Route = createFileRoute("/packages/$slug")({
   head: ({ loaderData }) => ({
     meta: loaderData?.tour
       ? [
-          { title: `${loaderData.tour.title} — Al Kareem Travel & Tours` },
+          { title: `${loaderData.tour.title} — DillKash Kashmir` },
           {
             name: "description",
             content: `${loaderData.tour.short} ${loaderData.tour.durationDays}-day all-inclusive tour from Lahore starting at ${formatPKR(loaderData.tour.price)}.`,
           },
-          { property: "og:title", content: `${loaderData.tour.title} — Al Kareem Travel & Tours` },
+          { property: "og:title", content: `${loaderData.tour.title} — DillKash Kashmir` },
           { property: "og:description", content: loaderData.tour.short },
         ]
-      : [{ title: "Tour Package — Al Kareem Travel & Tours" }],
+      : [{ title: "Tour Package — DillKash Kashmir" }],
   }),
   component: TourDetailPage,
 });
@@ -195,7 +195,7 @@ function TourDetailPage() {
               Book Now
             </button>
             <a
-              href={whatsappLink(`Hi Al Kareem Travel! I want to book: ${tour.title}`)}
+              href={whatsappLink(`Hi DillKash Kashmir! I want to book: ${tour.title}`)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-whatsapp px-7 py-4 text-sm font-bold text-whatsapp-foreground transition-transform hover:scale-105"

@@ -20,13 +20,13 @@ export const Route = createFileRoute("/packages/")({
   }),
   head: () => ({
     meta: [
-      { title: "Kashmir Tour Packages from Lahore — Al Kareem Travel & Tours" },
+      { title: "Kashmir Tour Packages from Lahore — DillKash Kashmir" },
       {
         name: "description",
         content:
           "Browse all Kashmir tour packages: 3, 5 & 7-day trips from Lahore to Neelum Valley, Arang Kel, Ratti Gali, Sharda & Taobat. Family, honeymoon, corporate & budget options.",
       },
-      { property: "og:title", content: "Kashmir Tour Packages from Lahore — Al Kareem Travel & Tours" },
+      { property: "og:title", content: "Kashmir Tour Packages from Lahore — DillKash Kashmir" },
       {
         property: "og:description",
         content:

@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/custom-tour")({
   head: () => ({
     meta: [
-      { title: "Plan a Custom Kashmir Tour — Al Kareem Travel & Tours" },
+      { title: "Plan a Custom Kashmir Tour — DillKash Kashmir" },
       {
         name: "description",
         content:
           "Design your own Kashmir itinerary from Lahore — perfect for families, private groups and corporate trips. Choose your dates, destinations and hotel standard.",
       },
-      { property: "og:title", content: "Plan a Custom Kashmir Tour — Al Kareem Travel & Tours" },
+      { property: "og:title", content: "Plan a Custom Kashmir Tour — DillKash Kashmir" },
       {
         property: "og:description",
         content:
