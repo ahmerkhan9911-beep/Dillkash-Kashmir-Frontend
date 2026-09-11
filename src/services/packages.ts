@@ -130,5 +130,7 @@ export async function getAdminStats() {
     activePackages: number;
     featuredPackages: number;
     totalUsers: number;
+    totalBookings: number;
+    pendingBookings: number;
   }>("/packages/admin/stats");
 }
