@@ -1,13 +1,29 @@
 /**
  * Centralized API client for DillKash Kashmir backend.
  * All API calls go through this module so auth headers are attached automatically.
+ *
+ * In development: Vite proxies `/api/*` → `http://localhost:5000/api/*` (see vite.config.ts).
+ * In production:  VITE_API_URL must be set to the production API origin (e.g. https://api.dillkashkashmir.com/api).
  */
 
-const RAW_API_URL = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
-  ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
-  : "https://api.dillkashkashmir.com/api";
+// In dev (Vite dev server), use a relative path so the proxy kicks in.
+// In production, use the env variable which resolves to the absolute production URL.
+const isDev =
+  typeof import.meta !== "undefined" &&
+  import.meta.env &&
+  import.meta.env["DEV"] === true;
 
-const API_BASE = RAW_API_URL.endsWith("/api") ? RAW_API_URL : `${RAW_API_URL}/api`;
+const RAW_API_URL = isDev
+  ? "" // relative — Vite proxy handles /api/* → localhost:5000
+  : (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
+    ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
+    : "https://api.dillkashkashmir.com/api";
+
+const API_BASE = isDev
+  ? "/api"
+  : RAW_API_URL.endsWith("/api")
+    ? RAW_API_URL
+    : `${RAW_API_URL}/api`;
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;

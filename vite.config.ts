@@ -8,6 +8,19 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   nitro: false,
+  vite: {
+    server: {
+      proxy: {
+        // During development, proxy /api/* to the local Express server.
+        // This avoids CORS issues and the need to change VITE_API_URL.
+        "/api": {
+          target: "http://localhost:5000",
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
+  },
   tanstackStart: {
     // Server entry used during build-time prerendering
     server: { entry: "server" },
@@ -23,3 +36,4 @@ export default defineConfig({
     },
   },
 });
+
