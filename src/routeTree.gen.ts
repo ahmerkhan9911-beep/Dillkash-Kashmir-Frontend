@@ -28,6 +28,7 @@ import { Route as PackagesIndexRouteImport } from './routes/packages.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
 import { Route as AdminBlogsIndexRouteImport } from './routes/admin/blogs.index'
 import { Route as AdminBlogsCreateRouteImport } from './routes/admin/blogs.create'
+import { Route as AdminBookingsIndexRouteImport } from './routes/admin/bookings.index'
 import { Route as AdminDestinationsIndexRouteImport } from './routes/admin/destinations.index'
 import { Route as AdminDestinationsCreateRouteImport } from './routes/admin/destinations.create'
 import { Route as AdminGuidesIndexRouteImport } from './routes/admin/guides.index'
@@ -135,6 +136,11 @@ const AdminBlogsCreateRoute = AdminBlogsCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AdminBlogsRoute,
 } as any)
+const AdminBookingsIndexRoute = AdminBookingsIndexRouteImport.update({
+  id: '/bookings/',
+  path: '/bookings/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDestinationsIndexRoute = AdminDestinationsIndexRouteImport.update({
   id: '/destinations/',
   path: '/destinations/',
@@ -214,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
   '/admin/blogs/': typeof AdminBlogsIndexRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/destinations/': typeof AdminDestinationsIndexRoute
   '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
   '/admin/blogs': typeof AdminBlogsIndexRoute
+  '/admin/bookings': typeof AdminBookingsIndexRoute
   '/admin/destinations': typeof AdminDestinationsIndexRoute
   '/admin/guides': typeof AdminGuidesIndexRoute
   '/admin/hotels': typeof AdminHotelsIndexRoute
@@ -274,6 +282,7 @@ export interface FileRoutesById {
   '/admin/hotels/create': typeof AdminHotelsCreateRoute
   '/admin/packages/create': typeof AdminPackagesCreateRoute
   '/admin/blogs/': typeof AdminBlogsIndexRoute
+  '/admin/bookings/': typeof AdminBookingsIndexRoute
   '/admin/destinations/': typeof AdminDestinationsIndexRoute
   '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/admin/hotels/create'
     | '/admin/packages/create'
     | '/admin/blogs/'
+    | '/admin/bookings/'
     | '/admin/destinations/'
     | '/admin/guides/'
     | '/admin/hotels/'
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/admin/hotels/create'
     | '/admin/packages/create'
     | '/admin/blogs'
+    | '/admin/bookings'
     | '/admin/destinations'
     | '/admin/guides'
     | '/admin/hotels'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/admin/hotels/create'
     | '/admin/packages/create'
     | '/admin/blogs/'
+    | '/admin/bookings/'
     | '/admin/destinations/'
     | '/admin/guides/'
     | '/admin/hotels/'
@@ -526,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBlogsCreateRouteImport
       parentRoute: typeof AdminBlogsRoute
     }
+    '/admin/bookings/': {
+      id: '/admin/bookings/'
+      path: '/bookings'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AdminBookingsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/destinations/': {
       id: '/admin/destinations/'
       path: '/destinations'
@@ -660,6 +679,7 @@ interface AdminRouteChildren {
   AdminPackagesRoute: typeof AdminPackagesRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminDestinationsCreateRoute: typeof AdminDestinationsCreateRoute
+  AdminBookingsIndexRoute: typeof AdminBookingsIndexRoute
   AdminDestinationsIndexRoute: typeof AdminDestinationsIndexRoute
   AdminGuidesIndexRoute: typeof AdminGuidesIndexRoute
   AdminDestinationsIdEditRoute: typeof AdminDestinationsIdEditRoute
@@ -671,6 +691,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPackagesRoute: AdminPackagesRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminDestinationsCreateRoute: AdminDestinationsCreateRoute,
+  AdminBookingsIndexRoute: AdminBookingsIndexRoute,
   AdminDestinationsIndexRoute: AdminDestinationsIndexRoute,
   AdminGuidesIndexRoute: AdminGuidesIndexRoute,
   AdminDestinationsIdEditRoute: AdminDestinationsIdEditRoute,

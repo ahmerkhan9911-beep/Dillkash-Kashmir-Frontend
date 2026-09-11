@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight, MapPin, Images } from "lucide-react";
 import type { DestinationItem } from "@/services/destinations";
+import { resolveImageUrl } from "@/lib/resolveImage";
+import { images as siteImages } from "@/data/site";
 
 interface DestinationGalleryModalProps {
   destination: DestinationItem | null;
@@ -18,11 +20,15 @@ export function DestinationGalleryModal({
     setActiveIndex(0);
   }, [destination]);
 
-  const images = destination?.gallery && destination.gallery.length > 0
+  const rawImages = destination?.gallery && destination.gallery.length > 0
     ? destination.gallery
     : destination?.cover_image
     ? [destination.cover_image]
-    : [];
+    : [siteImages.heroKashmir];
+
+  const images = rawImages
+    .map((img) => resolveImageUrl(img) || siteImages.heroKashmir)
+    .filter(Boolean);
 
   const handlePrev = useCallback(() => {
     if (images.length <= 1) return;
@@ -113,6 +119,9 @@ export function DestinationGalleryModal({
               key={images[activeIndex]}
               src={images[activeIndex]}
               alt={`${destination.name} - Photo ${activeIndex + 1}`}
+              onError={(e) => {
+                e.currentTarget.src = siteImages.heroKashmir;
+              }}
               className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl transition-all duration-300 animate-in fade-in zoom-in-95"
             />
           </div>
@@ -167,6 +176,9 @@ export function DestinationGalleryModal({
                 <img
                   src={img}
                   alt={`Thumbnail ${idx + 1}`}
+                  onError={(e) => {
+                    e.currentTarget.src = siteImages.heroKashmir;
+                  }}
                   className="h-full w-full object-cover"
                 />
               </button>

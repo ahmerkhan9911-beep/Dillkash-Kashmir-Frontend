@@ -37,6 +37,7 @@ import { BookingModal } from "@/components/site/BookingModal";
 import { WhatsAppIcon } from "@/components/site/Navbar";
 import { DestinationGalleryModal } from "@/components/site/DestinationGalleryModal";
 import { getDestinations, type DestinationItem } from "@/services/destinations";
+import InteractiveMountain2D from "@/components/site/InteractiveMountain2D";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -280,6 +281,46 @@ function PopularPackages({ onBook }: { onBook: (t: Tour) => void }) {
 
 /* --------------------------- Destinations --------------------------- */
 
+/**
+ * Safely resolves destination image URL.
+ * Dynamically prepends the backend uploads URL if a relative filename/path is provided,
+ * and falls back to a default destination asset if not found.
+ */
+function getDestinationCoverUrl(coverImage: string | null | undefined): string {
+  if (!coverImage) return images.heroKashmir;
+
+  const raw = String(coverImage).trim();
+  if (!raw) return images.heroKashmir;
+
+  // Blob URLs or data URIs
+  if (raw.startsWith("blob:") || raw.startsWith("data:")) {
+    return raw;
+  }
+
+  // Already fully qualified HTTP / HTTPS
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw;
+  }
+
+  // Bundled local static asset (from static fallback list)
+  if (raw.startsWith("/assets/") || raw.startsWith("@/assets/")) {
+    return raw;
+  }
+
+  const rawApiUrl =
+    typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"]
+      ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
+      : "https://api.dillkashkashmir.com";
+  const base = rawApiUrl.replace(/\/api$/, "");
+
+  const clean = raw.replace(/^\/+/, "");
+  if (clean.startsWith("uploads/")) {
+    return `${base}/${clean}`;
+  }
+
+  return `${base}/uploads/${clean}`;
+}
+
 function Destinations() {
   const [destList, setDestList] = useState<DestinationItem[]>([]);
   const [selectedDestination, setSelectedDestination] = useState<DestinationItem | null>(null);
@@ -321,37 +362,53 @@ function Destinations() {
         />
       </Reveal>
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {displayDestinations.map((d, i) => (
-          <Reveal key={d.slug || d.name} delay={(i % 4) * 70}>
-            <button
-              type="button"
-              onClick={() => setSelectedDestination(d)}
-              className="card-hover group relative block aspect-[3/4] w-full overflow-hidden rounded-3xl shadow-soft text-left cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              aria-label={`View photos and explore ${d.name}`}
-            >
-              <img
-                src={d.cover_image}
-                alt={`${d.name}, Azad Jammu & Kashmir`}
-                width={1280}
-                height={720}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <h3 className="font-heading text-lg font-bold text-white">{d.name}</h3>
-                <p className="mt-1 max-h-0 overflow-hidden text-sm leading-relaxed text-white/80 transition-all duration-500 group-hover:max-h-24">
-                  {d.description}
-                </p>
-                <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white opacity-0 backdrop-blur transition-all duration-500 group-hover:opacity-100">
-                  <Camera size={12} />
-                  View Gallery
-                  <ArrowRight size={12} />
-                </span>
-              </div>
-            </button>
-          </Reveal>
-        ))}
+        {displayDestinations.map((d, i) => {
+          const coverSrc = getDestinationCoverUrl(d.cover_image);
+
+          return (
+            <Reveal key={d.slug || d.name} delay={(i % 4) * 70}>
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedDestination({
+                    ...d,
+                    cover_image: coverSrc,
+                    gallery: (d.gallery && d.gallery.length > 0
+                      ? d.gallery
+                      : [d.cover_image]
+                    ).map(getDestinationCoverUrl),
+                  })
+                }
+                className="card-hover group relative block aspect-[3/4] w-full overflow-hidden rounded-3xl bg-muted shadow-soft text-left cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View photos and explore ${d.name}`}
+              >
+                <img
+                  src={coverSrc}
+                  alt={`${d.name}, Azad Jammu & Kashmir`}
+                  width={1280}
+                  height={720}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.src = images.heroKashmir;
+                  }}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-5">
+                  <h3 className="font-heading text-lg font-bold text-white">{d.name}</h3>
+                  <p className="mt-1 max-h-0 overflow-hidden text-sm leading-relaxed text-white/80 transition-all duration-500 group-hover:max-h-24">
+                    {d.description}
+                  </p>
+                  <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white opacity-0 backdrop-blur transition-all duration-500 group-hover:opacity-100">
+                    <Camera size={12} />
+                    View Gallery
+                    <ArrowRight size={12} />
+                  </span>
+                </div>
+              </button>
+            </Reveal>
+          );
+        })}
       </div>
 
       {/* Destination Lightbox Gallery Modal */}
@@ -657,6 +714,7 @@ function HomePage() {
       <WhyChooseUs />
       <PopularPackages onBook={openBooking} />
       <Destinations />
+      <InteractiveMountain2D />
       <Inclusions />
       <VideoSection />
       <Testimonials />

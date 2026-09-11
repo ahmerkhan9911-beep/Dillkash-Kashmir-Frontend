@@ -64,6 +64,11 @@ export function resolveImageUrl(url: string | null | undefined): string {
     return staticAssetMap[trimmed];
   }
 
+  // Frontend bundled assets (Vite emitted assets in /assets/...)
+  if (trimmed.startsWith("/assets/") && !trimmed.startsWith("/uploads/")) {
+    return trimmed;
+  }
+
   const rawUrl = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env["VITE_API_URL"])
     ? String(import.meta.env["VITE_API_URL"]).trim().replace(/\/+$/, "")
     : "https://api.dillkashkashmir.com";
