@@ -80,20 +80,45 @@ export async function api<T = unknown>(
     reqInit.body = JSON.stringify(body);
   }
 
-  const res = await fetch(`${API_BASE}${endpoint}`, reqInit);
+  const url = `${API_BASE}${endpoint}`;
+  let res: Response;
 
-  const data = await res.json();
+  try {
+    res = await fetch(url, reqInit);
+  } catch (networkErr) {
+    // fetch() itself threw — network down, DNS failure, CORS preflight blocked, etc.
+    const msg = networkErr instanceof Error ? networkErr.message : String(networkErr);
+    console.error(`[API] Network error → ${method} ${url}`, networkErr);
+    throw new Error(`Network error: ${msg}. Check your internet connection or CORS configuration.`);
+  }
+
+  // Safely parse response — server might return HTML (e.g. a 404/500 page) instead of JSON
+  let data: unknown;
+  const contentType = res.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    data = await res.json();
+  } else {
+    const text = await res.text();
+    console.warn(`[API] Non-JSON response (${res.status} ${res.statusText}) → ${method} ${url}\n`, text.slice(0, 400));
+    // Surface a useful error so the UI can display it
+    data = {
+      error: `Server returned ${res.status} ${res.statusText}. Expected JSON but got: ${contentType || "unknown content-type"}. The route may not exist on the production server yet.`,
+    };
+  }
 
   if (!res.ok) {
+    const d = data as { error?: string; errors?: { msg: string }[] };
     const errorMessage =
-      data.error ||
-      data.errors?.map((e: { msg: string }) => e.msg).join(", ") ||
-      "Something went wrong";
+      d.error ||
+      d.errors?.map((e) => e.msg).join(", ") ||
+      `HTTP ${res.status} ${res.statusText}`;
+    console.error(`[API] ${res.status} ${res.statusText} → ${method} ${url}`, data);
     throw new Error(errorMessage);
   }
 
   return data as T;
 }
+
 
 /**
  * Upload a single image file to the server.
