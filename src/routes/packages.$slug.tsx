@@ -21,6 +21,7 @@ import { BookingModal } from "@/components/site/BookingModal";
 import { Reveal } from "@/components/site/Reveal";
 import { WhatsAppIcon } from "@/components/site/Navbar";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 export const Route = createFileRoute("/packages/$slug")({
   loader: ({ params }) => {
@@ -124,6 +125,7 @@ function TourDetailPage() {
   const [tour, setTour] = useState<Tour | null>(loaderData.tour);
   const [loading, setLoading] = useState(!loaderData.tour);
   const [modalOpen, setModalOpen] = useState(false);
+  const { user } = useAuth();
 
   // Fetch from API (richer data with itinerary details)
   useEffect(() => {
@@ -187,22 +189,26 @@ function TourDetailPage() {
                 {formatPKR(tour.price)}
               </span>
             </p>
-            <button
-              type="button"
-              onClick={() => setModalOpen(true)}
-              className="rounded-full bg-primary px-8 py-4 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-105"
-            >
-              Book Now
-            </button>
-            <a
-              href={whatsappLink(`Hi DillKash Kashmir! I want to book: ${tour.title}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-whatsapp px-7 py-4 text-sm font-bold text-whatsapp-foreground transition-transform hover:scale-105"
-            >
-              <WhatsAppIcon size={18} />
-              WhatsApp
-            </a>
+            {user?.role === 'user' && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(true)}
+                  className="rounded-full bg-primary px-8 py-4 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-105"
+                >
+                  Book Now
+                </button>
+                <a
+                  href={whatsappLink(`Hi DillKash Kashmir! I want to book: ${tour.title}`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full bg-whatsapp px-7 py-4 text-sm font-bold text-whatsapp-foreground transition-transform hover:scale-105"
+                >
+                  <WhatsAppIcon size={18} />
+                  WhatsApp
+                </a>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -322,22 +328,24 @@ function TourDetailPage() {
                 Seats fill fast for the {tour.nextDeparture} departure. Reserve yours today.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => setModalOpen(true)}
-                className="rounded-full bg-background px-7 py-3.5 text-sm font-bold text-foreground transition-transform hover:scale-105"
-              >
-                Book This Tour
-              </button>
-              <a
-                href={site.phoneHref}
-                className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/40 px-7 py-3.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-white/10"
-              >
-                <Phone size={16} />
-                {site.phone}
-              </a>
-            </div>
+            {user?.role === 'user' && (
+              <div className="flex flex-wrap justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(true)}
+                  className="rounded-full bg-background px-7 py-3.5 text-sm font-bold text-foreground transition-transform hover:scale-105"
+                >
+                  Book This Tour
+                </button>
+                <a
+                  href={site.phoneHref}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/40 px-7 py-3.5 text-sm font-bold text-primary-foreground transition-colors hover:bg-white/10"
+                >
+                  <Phone size={16} />
+                  {site.phone}
+                </a>
+              </div>
+            )}
           </div>
         </Reveal>
       </div>
