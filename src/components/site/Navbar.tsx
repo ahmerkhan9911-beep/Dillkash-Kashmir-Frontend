@@ -92,6 +92,8 @@ export function Navbar() {
           aria-label="Main"
         >
           {navLinks.map((link) => {
+            if (isAdmin && link.to === "/custom-tour") return null;
+
             const isAnchor = "hash" in link && Boolean(link.hash);
             const baseClass = cn(
               "whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] font-semibold transition-colors xl:px-3.5 xl:py-2 xl:text-sm",
@@ -254,13 +256,15 @@ export function Navbar() {
           >
             Destinations
           </a>
-          <Link
-            to="/custom-tour"
-            onClick={() => setOpen(false)}
-            className="rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
-          >
-            Custom Tour
-          </Link>
+          {!isAdmin && (
+            <Link
+              to="/custom-tour"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+            >
+              Custom Tour
+            </Link>
+          )}
           <Link
             to="/about"
             onClick={() => setOpen(false)}

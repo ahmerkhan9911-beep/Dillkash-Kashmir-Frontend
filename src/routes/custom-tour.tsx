@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Send, Car, Truck, Bus, LogIn } from "lucide-react";
+import { Check, Send, Car, Truck, Bus, LogIn, Shield } from "lucide-react";
 import { destinations, whatsappLink } from "@/data/site";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
@@ -56,7 +56,7 @@ const TRANSPORT_OPTIONS = [
 ] as const;
 
 function CustomTourPage() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState<CustomForm>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof CustomForm, string>>>({});
@@ -150,7 +150,23 @@ function CustomTourPage() {
               subtitle="Fill this in and our tour planners will call you with a tailored itinerary and quote."
             />
 
-            {sent ? (
+            {isAdmin ? (
+              <div className="mt-8 rounded-2xl bg-secondary p-8 text-center">
+                <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-destructive/10 text-destructive">
+                  <Shield size={28} />
+                </div>
+                <p className="font-heading text-lg font-bold text-foreground">Action Not Allowed</p>
+                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+                  Admins cannot request custom tours. Please log in as a regular user to submit a request.
+                </p>
+                <Link
+                  to="/admin"
+                  className="mt-6 inline-block rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground"
+                >
+                  Go to Admin Dashboard
+                </Link>
+              </div>
+            ) : sent ? (
               <div className="mt-8 rounded-2xl bg-secondary p-8 text-center">
                 <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground">
                   <Check size={28} />
