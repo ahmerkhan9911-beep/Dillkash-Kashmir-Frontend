@@ -1,11 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Send, Car, Truck, Bus } from "lucide-react";
+import { Check, Send, Car, Truck, Bus, LogIn } from "lucide-react";
 import { destinations, whatsappLink } from "@/data/site";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { images } from "@/data/site";
 import { cn } from "@/lib/utils";
+import { submitCustomTour } from "@/services/custom-tours";
+import { useAuth } from "@/context/AuthContext";
 
 export const Route = createFileRoute("/custom-tour")({
   head: () => ({
@@ -28,8 +30,6 @@ export const Route = createFileRoute("/custom-tour")({
 });
 
 interface CustomForm {
-  name: string;
-  phone: string;
   date: string;
   adults: number;
   kids: number;
@@ -40,8 +40,6 @@ interface CustomForm {
 }
 
 const initial: CustomForm = {
-  name: "",
-  phone: "",
   date: "",
   adults: 2,
   kids: 0,
@@ -58,9 +56,14 @@ const TRANSPORT_OPTIONS = [
 ] as const;
 
 function CustomTourPage() {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState<CustomForm>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof CustomForm, string>>>({});
   const [sent, setSent] = useState(false);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const toggleDestination = (name: string) =>
     setForm((f) => ({
@@ -70,16 +73,43 @@ function CustomTourPage() {
         : [...f.destinations, name],
     }));
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Auth gate: redirect to login if not authenticated
+    if (!isAuthenticated) {
+      navigate({ to: "/login", search: { redirect: "/custom-tour" } });
+      return;
+    }
+
     const err: Partial<Record<keyof CustomForm, string>> = {};
-    if (form.name.trim().length < 3) err.name = "Please enter your full name";
-    if (!/^(\+?92|0)?\d{10}$/.test(form.phone.replace(/[\s-]/g, "")))
-      err.phone = "Enter a valid phone number";
     if (!form.date) err.date = "Please choose a preferred date";
     if (form.destinations.length === 0) err.destinations = "Pick at least one destination";
     setErrors(err);
-    if (Object.keys(err).length === 0) setSent(true);
+
+    if (Object.keys(err).length > 0) return;
+
+    setIsSubmitting(true);
+    setApiError("");
+
+    try {
+      await submitCustomTour({
+        name: user?.full_name || "",
+        phoneNumber: user?.phone || "",
+        preferredDate: form.date,
+        adults: form.adults,
+        kids: form.kids,
+        hotelPreference: form.hotel,
+        transportPreference: form.transportPreference,
+        preferredDestinations: form.destinations,
+        message: form.message,
+      });
+      setSent(true);
+    } catch (error) {
+      setApiError(error instanceof Error ? error.message : "Something went wrong.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const inputCls = (hasError?: string) =>
@@ -127,9 +157,15 @@ function CustomTourPage() {
                 </div>
                 <p className="font-heading text-lg font-bold text-foreground">Request Received!</p>
                 <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-                  Thanks {form.name.split(" ")[0]} — a tour planner will call{" "}
-                  <strong className="text-foreground">{form.phone}</strong> within
+                  Thanks {user?.full_name?.split(" ")[0]} — a tour planner will call{" "}
+                  <strong className="text-foreground">{user?.phone}</strong> within
                   a few hours with your custom itinerary.
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Track your request status on{" "}
+                  <Link to="/my-bookings" className="font-bold text-primary hover:underline">
+                    My Bookings
+                  </Link>
                 </p>
                 <a
                   href={whatsappLink(`Hi! I just submitted a custom tour request for ${form.destinations.join(", ")}.`)}
@@ -142,32 +178,36 @@ function CustomTourPage() {
               </div>
             ) : (
               <form onSubmit={submit} noValidate className="mt-8 grid gap-5">
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="c-name" className="mb-1.5 block text-sm font-semibold text-foreground">Name</label>
-                    <input
-                      id="c-name"
-                      type="text"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      placeholder="Your full name"
-                      className={inputCls(errors.name)}
-                    />
-                    {errors.name && <p className="mt-1 text-xs font-medium text-destructive">{errors.name}</p>}
+                {apiError && (
+                  <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-4 text-sm font-semibold text-destructive">
+                    {apiError}
                   </div>
-                  <div>
-                    <label htmlFor="c-phone" className="mb-1.5 block text-sm font-semibold text-foreground">Phone Number</label>
-                    <input
-                      id="c-phone"
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      placeholder="0300 1234567"
-                      className={inputCls(errors.phone)}
-                    />
-                    {errors.phone && <p className="mt-1 text-xs font-medium text-destructive">{errors.phone}</p>}
+                )}
+
+                {/* Auth gate banner or user info */}
+                {!isAuthenticated ? (
+                  <div className="rounded-xl border border-primary/30 bg-primary/5 p-5 text-center">
+                    <LogIn size={24} className="mx-auto mb-2 text-primary" />
+                    <p className="text-sm font-semibold text-foreground">Login required to submit</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Your name and phone will be auto-filled from your account.
+                    </p>
+                    <Link
+                      to="/login"
+                      search={{ redirect: "/custom-tour" }}
+                      className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground"
+                    >
+                      <LogIn size={14} />
+                      Sign In
+                    </Link>
                   </div>
-                </div>
+                ) : (
+                  <div className="rounded-xl border border-border bg-secondary/50 px-4 py-3">
+                    <p className="text-xs font-semibold text-muted-foreground">Requesting as</p>
+                    <p className="mt-0.5 text-sm font-bold text-foreground">{user?.full_name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email} · {user?.phone}</p>
+                  </div>
+                )}
 
                 <div className="grid gap-5 sm:grid-cols-3">
                   <div>
@@ -301,10 +341,17 @@ function CustomTourPage() {
 
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary py-4 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-[1.02]"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary py-4 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100"
                 >
-                  <Send size={16} />
-                  Submit Request
+                  {isSubmitting ? (
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                  ) : (
+                    <>
+                      <Send size={16} />
+                      Submit Request
+                    </>
+                  )}
                 </button>
               </form>
             )}

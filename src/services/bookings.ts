@@ -15,8 +15,10 @@ export interface BookingPayload {
 
 export interface Booking {
   id: number;
+  user_id: number | null;
   full_name: string;
   phone_number: string;
+  email: string;
   selected_tour: string;
   travel_date: string | null;
   adults: number;
@@ -26,7 +28,7 @@ export interface Booking {
   created_at: string;
 }
 
-/** Submit a new booking (public) */
+/** Submit a new booking (authenticated) */
 export async function submitBooking(payload: BookingPayload): Promise<{ message: string; booking: Booking }> {
   return api<{ message: string; booking: Booking }>("/bookings", {
     method: "POST",
@@ -38,6 +40,12 @@ export async function submitBooking(payload: BookingPayload): Promise<{ message:
 export async function getAllBookings(status?: string): Promise<Booking[]> {
   const endpoint = status ? `/bookings?status=${encodeURIComponent(status)}` : "/bookings";
   const data = await api<{ bookings: Booking[] }>(endpoint);
+  return data.bookings;
+}
+
+/** Get the logged-in user's own bookings */
+export async function getMyBookings(): Promise<Booking[]> {
+  const data = await api<{ bookings: Booking[] }>("/bookings/my");
   return data.bookings;
 }
 

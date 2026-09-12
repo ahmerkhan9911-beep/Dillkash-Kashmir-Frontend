@@ -132,5 +132,6 @@ export async function getAdminStats() {
     totalUsers: number;
     totalBookings: number;
     pendingBookings: number;
+    pendingCustomTours: number;
   }>("/packages/admin/stats");
 }

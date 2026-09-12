@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { X, Loader2, CheckCircle2 } from "lucide-react";
+import { X, Loader2, CheckCircle2, LogIn } from "lucide-react";
 import { tours, whatsappLink, type Tour } from "@/data/site";
 import { WhatsAppIcon } from "./Navbar";
 import { submitBooking } from "@/services/bookings";
+import { useAuth } from "@/context/AuthContext";
+import { Link } from "@tanstack/react-router";
 
 interface BookingModalProps {
   open: boolean;
@@ -11,8 +13,6 @@ interface BookingModalProps {
 }
 
 interface FormState {
-  name: string;
-  phone: string;
   tour: string;
   date: string;
   adults: number;
@@ -21,8 +21,6 @@ interface FormState {
 }
 
 const initial: FormState = {
-  name: "",
-  phone: "",
   tour: "",
   date: "",
   adults: 2,
@@ -31,6 +29,7 @@ const initial: FormState = {
 };
 
 export function BookingModal({ open, onClose, preselectedTour }: BookingModalProps) {
+  const { user, isAuthenticated } = useAuth();
   const [form, setForm] = useState<FormState>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,9 +58,6 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
 
   const validate = () => {
     const e: Partial<Record<keyof FormState, string>> = {};
-    if (form.name.trim().length < 2) e.name = "Please enter your full name";
-    if (!/^(\+?92|0)?\d{10,11}$/.test(form.phone.replace(/[\s-]/g, "")))
-      e.phone = "Enter a valid phone number (e.g. 03001234567)";
     if (!form.tour) e.tour = "Please select a tour";
     if (!form.date) e.date = "Please pick a travel date";
     if (form.adults < 1) e.adults = "At least 1 adult required";
@@ -78,8 +74,8 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
 
     try {
       await submitBooking({
-        fullName: form.name,
-        phoneNumber: form.phone,
+        fullName: user?.full_name || "",
+        phoneNumber: user?.phone || "",
         selectedTour: form.tour,
         travelDate: form.date || undefined,
         adults: form.adults,
@@ -97,7 +93,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
   };
 
   const whatsappBooking = () => {
-    const msg = `Hi DillKash Kashmir! I want to book: ${form.tour || "a Kashmir tour"}\nName: ${form.name}\nDate: ${form.date || "Flexible"}\nTravelers: ${form.adults} adults, ${form.kids} kids\nRoom: ${form.room}`;
+    const msg = `Hi DillKash Kashmir! I want to book: ${form.tour || "a Kashmir tour"}\nName: ${user?.full_name || ""}\nDate: ${form.date || "Flexible"}\nTravelers: ${form.adults} adults, ${form.kids} kids\nRoom: ${form.room}`;
     window.open(whatsappLink(msg), "_blank", "noopener");
   };
 
@@ -138,8 +134,36 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
           </button>
         </div>
 
-        {/* ── Success Screen ── */}
-        {isSuccess ? (
+        {/* ── Auth Gate ── */}
+        {!isAuthenticated ? (
+          <div className="rounded-2xl bg-secondary p-8 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <LogIn size={28} />
+            </div>
+            <h4 className="font-heading text-lg font-bold text-foreground">
+              Login Required
+            </h4>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Please sign in to book a tour. Your details will be auto-filled from your account.
+            </p>
+            <Link
+              to="/login"
+              search={{ redirect: "/packages" }}
+              onClick={onClose}
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-[1.02]"
+            >
+              <LogIn size={16} />
+              Sign In to Book
+            </Link>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Don't have an account?{" "}
+              <Link to="/signup" onClick={onClose} className="font-bold text-primary hover:underline">
+                Create one
+              </Link>
+            </p>
+          </div>
+        ) : isSuccess ? (
+          /* ── Success Screen ── */
           <div className="rounded-2xl bg-secondary p-8 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-cta">
               <CheckCircle2 size={32} strokeWidth={2.5} aria-hidden />
@@ -149,9 +173,9 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
             </h4>
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
               Thank you,{" "}
-              <strong className="text-foreground">{form.name.split(" ")[0]}</strong>! Our team
+              <strong className="text-foreground">{user?.full_name?.split(" ")[0]}</strong>! Our team
               will call you at{" "}
-              <strong className="text-foreground">{form.phone}</strong> shortly to confirm
+              <strong className="text-foreground">{user?.phone}</strong> shortly to confirm
               your seats.
             </p>
             {form.tour && (
@@ -171,6 +195,12 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
                 )}
               </p>
             )}
+            <p className="mt-2 text-xs text-muted-foreground">
+              Track your booking status on{" "}
+              <Link to="/my-bookings" onClick={onClose} className="font-bold text-primary hover:underline">
+                My Bookings
+              </Link>
+            </p>
             <button
               type="button"
               onClick={onClose}
@@ -189,38 +219,11 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
               </div>
             )}
 
-            {/* Full Name */}
-            <div>
-              <label htmlFor="bk-name" className="mb-1.5 block text-sm font-semibold text-foreground">
-                Full Name
-              </label>
-              <input
-                id="bk-name"
-                type="text"
-                value={form.name}
-                onChange={(e) => set("name", e.target.value)}
-                placeholder="Muhammad Ahmad"
-                className={inputCls(errors.name)}
-                disabled={isSubmitting}
-              />
-              {errors.name && <p className="mt-1 text-xs font-medium text-destructive">{errors.name}</p>}
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label htmlFor="bk-phone" className="mb-1.5 block text-sm font-semibold text-foreground">
-                Phone Number
-              </label>
-              <input
-                id="bk-phone"
-                type="tel"
-                value={form.phone}
-                onChange={(e) => set("phone", e.target.value)}
-                placeholder="0300 1234567"
-                className={inputCls(errors.phone)}
-                disabled={isSubmitting}
-              />
-              {errors.phone && <p className="mt-1 text-xs font-medium text-destructive">{errors.phone}</p>}
+            {/* Auto-filled user info banner */}
+            <div className="rounded-xl border border-border bg-secondary/50 px-4 py-3">
+              <p className="text-xs font-semibold text-muted-foreground">Booking as</p>
+              <p className="mt-0.5 text-sm font-bold text-foreground">{user?.full_name}</p>
+              <p className="text-xs text-muted-foreground">{user?.email} · {user?.phone}</p>
             </div>
 
             {/* Tour + Date */}

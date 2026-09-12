@@ -25,9 +25,10 @@ const NAV_LINKS = [
   { to: "/admin/packages", label: "Packages", icon: Package, exact: false, badge: false },
   { to: "/admin/hotels", label: "Hotels", icon: Hotel, exact: false, badge: false },
   { to: "/admin/destinations", label: "Destinations", icon: MapPin, exact: false, badge: false },
-  { to: "/admin/guides", label: "Tour Guides", icon: UserCheck, exact: false, badge: false },
-  { to: "/admin/blogs", label: "Blogs & Updates", icon: FileText, exact: false, badge: false },
-  { to: "/admin/bookings", label: "Bookings", icon: CalendarCheck, exact: false, badge: true }, // badge=true → show pending count
+  { to: "/admin/guides", label: "Tour Guides", icon: UserCheck, exact: false, badge: false, badgeCount: 0 },
+  { to: "/admin/blogs", label: "Blogs & Updates", icon: FileText, exact: false, badge: false, badgeCount: 0 },
+  { to: "/admin/bookings", label: "Bookings", icon: CalendarCheck, exact: false, badge: true, badgeType: "pendingBookings" },
+  { to: "/admin/custom-tours", label: "Custom Requests", icon: MapPin, exact: false, badge: true, badgeType: "pendingCustomTours" },
 ] as const;
 
 export function AdminSidebar() {
@@ -36,13 +37,15 @@ export function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [pendingBookings, setPendingBookings] = useState(0);
+  const [pendingCustomTours, setPendingCustomTours] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Poll pending bookings count every 30 s
+  // Poll pending counts every 30 s
   const fetchPending = async () => {
     try {
       const data = await getAdminStats();
       setPendingBookings(data.pendingBookings ?? 0);
+      setPendingCustomTours(data.pendingCustomTours ?? 0);
     } catch {
       // Silent — don't disrupt UI if stats fail
     }
@@ -90,7 +93,8 @@ export function AdminSidebar() {
             ? currentPath === l.to
             : currentPath.startsWith(l.to);
 
-          const showBadge = l.badge && pendingBookings > 0;
+          const badgeCount = l.badgeType === "pendingBookings" ? pendingBookings : l.badgeType === "pendingCustomTours" ? pendingCustomTours : 0;
+          const showBadge = l.badge && badgeCount > 0;
 
           return (
             <Link
@@ -121,9 +125,9 @@ export function AdminSidebar() {
                   {showBadge && (
                     <span
                       className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-orange-500 px-1.5 text-[10px] font-bold text-white shadow-sm"
-                      aria-label={`${pendingBookings} pending bookings`}
+                      aria-label={`${badgeCount} pending`}
                     >
-                      {pendingBookings > 99 ? "99+" : pendingBookings}
+                      {badgeCount > 99 ? "99+" : badgeCount}
                     </span>
                   )}
                 </span>
@@ -169,7 +173,7 @@ export function AdminSidebar() {
       >
         <Menu size={20} />
         {/* Mobile badge dot */}
-        {pendingBookings > 0 && (
+        {(pendingBookings > 0 || pendingCustomTours > 0) && (
           <span className="absolute right-1.5 top-1.5 flex h-3 w-3 items-center justify-center rounded-full bg-orange-500">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
           </span>

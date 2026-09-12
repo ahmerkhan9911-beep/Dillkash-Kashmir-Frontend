@@ -107,11 +107,16 @@ export async function api<T = unknown>(
   }
 
   if (!res.ok) {
-    const d = data as { error?: string; errors?: { msg: string }[] };
-    const errorMessage =
+    const d = data as { error?: string; errors?: { msg: string }[]; details?: string };
+    let errorMessage =
       d.error ||
       d.errors?.map((e) => e.msg).join(", ") ||
       `HTTP ${res.status} ${res.statusText}`;
+
+    if (d.details) {
+      errorMessage += ` (Details: ${d.details})`;
+    }
+
     console.error(`[API] ${res.status} ${res.statusText} → ${method} ${url}`, data);
     throw new Error(errorMessage);
   }

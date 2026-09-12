@@ -25,11 +25,12 @@ type AuthMode = "signin" | "signup";
 
 interface AuthPageProps {
   initialMode?: AuthMode;
+  redirectUrl?: string;
 }
 
 /* ─────────────────────────── component ─────────────────────── */
 
-export default function AuthPage({ initialMode = "signin" }: AuthPageProps) {
+export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPageProps) {
   const { login, signup, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
 
@@ -60,10 +61,11 @@ export default function AuthPage({ initialMode = "signin" }: AuthPageProps) {
   /* ── redirect if authed ── */
   useEffect(() => {
     if (isAuthenticated && !success) {
-      if (isAdmin) navigate({ to: "/admin" });
+      if (redirectUrl) navigate({ to: redirectUrl as any });
+      else if (isAdmin) navigate({ to: "/admin" });
       else navigate({ to: "/" });
     }
-  }, [isAuthenticated, isAdmin, success, navigate]);
+  }, [isAuthenticated, isAdmin, success, navigate, redirectUrl]);
 
   if (isAuthenticated && !success) return null;
 
@@ -88,7 +90,8 @@ export default function AuthPage({ initialMode = "signin" }: AuthPageProps) {
     setLoading(true);
     try {
       await login(loginEmail, loginPassword);
-      navigate({ to: "/" });
+      if (redirectUrl) navigate({ to: redirectUrl as any });
+      else navigate({ to: "/" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -122,7 +125,10 @@ export default function AuthPage({ initialMode = "signin" }: AuthPageProps) {
     try {
       await signup(signupForm);
       setSuccess(true);
-      setTimeout(() => navigate({ to: "/" }), 1500);
+      setTimeout(() => {
+        if (redirectUrl) navigate({ to: redirectUrl as any });
+        else navigate({ to: "/" });
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {

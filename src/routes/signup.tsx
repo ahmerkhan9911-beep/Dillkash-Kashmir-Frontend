@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Eye, EyeOff, UserPlus, Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -6,6 +6,9 @@ import { Reveal } from "@/components/site/Reveal";
 import heroImg from "@/assets/hero-kashmir.jpg";
 
 export const Route = createFileRoute("/signup")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: search.redirect as string | undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Create Account — DillKash Kashmir" },
@@ -16,6 +19,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignupPage() {
+  const { redirect } = Route.useSearch();
   const { signup, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -33,7 +37,8 @@ function SignupPage() {
   const [success, setSuccess] = useState(false);
 
   if (isAuthenticated && !success) {
-    navigate({ to: "/" });
+    if (redirect) navigate({ to: redirect as any });
+    else navigate({ to: "/" });
     return null;
   }
 
@@ -62,7 +67,10 @@ function SignupPage() {
       await signup(form);
       setSuccess(true);
       // Auto-redirect after short delay
-      setTimeout(() => navigate({ to: "/" }), 1500);
+      setTimeout(() => {
+        if (redirect) navigate({ to: redirect as any });
+        else navigate({ to: "/" });
+      }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");
     } finally {

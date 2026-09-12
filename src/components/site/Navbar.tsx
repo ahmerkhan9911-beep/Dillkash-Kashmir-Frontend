@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, Phone, X, LogIn, LogOut, User, Shield } from "lucide-react";
+import { Menu, Phone, X, LogIn, LogOut, User, Shield, CalendarDays } from "lucide-react";
 import { site, whatsappLink } from "@/data/site";
 import logoHorizontal from "@/assets/dillkash-logo-horizontal.png";
 import logoIcon from "@/assets/dillkash-logo-icon.png";
@@ -145,6 +145,18 @@ export function Navbar() {
             </Link>
           ) : (
             <div className="hidden items-center gap-1.5 sm:flex">
+              <Link
+                to="/my-bookings"
+                className={cn(
+                  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-bold transition-colors",
+                  scrolled
+                    ? "bg-primary/10 text-primary hover:bg-primary/20"
+                    : "bg-white/20 text-white backdrop-blur hover:bg-white/30",
+                )}
+              >
+                <CalendarDays size={13} />
+                <span>My Bookings</span>
+              </Link>
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -299,6 +311,14 @@ export function Navbar() {
               </Link>
             ) : (
               <div className="grid gap-2">
+                <Link
+                  to="/my-bookings"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-2.5 text-sm font-bold text-primary hover:bg-primary/20"
+                >
+                  <CalendarDays size={16} />
+                  My Bookings
+                </Link>
                 {isAdmin && (
                   <Link
                     to="/admin"

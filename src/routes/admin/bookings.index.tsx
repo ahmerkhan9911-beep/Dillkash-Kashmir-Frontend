@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type React from "react";
-import { Loader2, Trash2, CheckCircle2, XCircle, Clock, CalendarDays, Users, BedDouble } from "lucide-react";
+import { Loader2, Trash2, CheckCircle2, XCircle, Clock, CalendarDays, Users, BedDouble, Mail } from "lucide-react";
 import { getAllBookings, updateBookingStatus, deleteBooking, type Booking } from "@/services/bookings";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
 
@@ -154,7 +154,7 @@ function AdminBookings() {
                 </div>
 
                 {/* Phone */}
-                <p className="text-sm text-muted-foreground">
+                <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   📞{" "}
                   <a
                     href={`tel:${b.phone_number}`}
@@ -163,6 +163,17 @@ function AdminBookings() {
                     {b.phone_number}
                   </a>
                 </p>
+                {b.email && (
+                  <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Mail size={14} className="shrink-0" />{" "}
+                    <a
+                      href={`mailto:${b.email}`}
+                      className="font-semibold text-foreground hover:underline truncate"
+                    >
+                      {b.email}
+                    </a>
+                  </p>
+                )}
 
                 {/* Tour */}
                 {b.selected_tour && (

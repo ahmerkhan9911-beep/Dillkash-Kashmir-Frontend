@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Package, Users, Star, Activity, CalendarCheck, Bell, RefreshCw } from "lucide-react";
+import { Package, Users, Star, Activity, CalendarCheck, Bell, RefreshCw, MapPin } from "lucide-react";
 import { getAdminStats } from "@/services/packages";
 
 export const Route = createFileRoute("/admin/")({
@@ -14,6 +14,7 @@ interface Stats {
   totalUsers: number;
   totalBookings: number;
   pendingBookings: number;
+  pendingCustomTours: number;
 }
 
 const POLL_INTERVAL_MS = 30_000; // 30 seconds
@@ -26,6 +27,7 @@ function AdminDashboard() {
     totalUsers: 0,
     totalBookings: 0,
     pendingBookings: 0,
+    pendingCustomTours: 0,
   });
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -65,6 +67,16 @@ function AdminDashboard() {
       pulse: stats.pendingBookings > 0,
       link: "/admin/bookings?status=Pending",
       note: stats.pendingBookings > 0 ? "Needs attention" : "All clear",
+    },
+    {
+      label: "Custom Requests",
+      value: stats.pendingCustomTours,
+      icon: MapPin,
+      color: "bg-blue-100 text-blue-600",
+      ring: stats.pendingCustomTours > 0 ? "ring-2 ring-blue-300/60" : "",
+      pulse: stats.pendingCustomTours > 0,
+      link: "/admin/custom-tours?status=Pending",
+      note: stats.pendingCustomTours > 0 ? "Needs attention" : "All clear",
     },
     {
       label: "Total Bookings",
