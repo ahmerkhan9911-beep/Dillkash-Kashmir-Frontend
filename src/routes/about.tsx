@@ -90,7 +90,7 @@ function AboutPage() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <Reveal>
-            <div className="img-zoom overflow-hidden rounded-[2rem] shadow-lift">
+            <div className="img-zoom overflow-hidden rounded-[2rem] shadow-lift" style={{ boxShadow: "rgba(0, 0, 0, 0.15) -3px -6px 19px" }}>
               <img
                 src={images.keran}
                 alt="Keran, Neelum Valley — one of our home destinations"

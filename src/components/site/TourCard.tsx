@@ -4,6 +4,7 @@ import { Calendar, Clock, MapPin, ChevronLeft, ChevronRight, Images } from "luci
 import { formatPKR, whatsappLink, type Tour } from "@/data/site";
 import { StarRating } from "./StarRating";
 import { WhatsAppIcon } from "./Navbar";
+import { useAuth } from "@/context/AuthContext";
 
 interface TourCardProps {
   tour: Tour;
@@ -11,6 +12,9 @@ interface TourCardProps {
 }
 
 export function TourCard({ tour, onBook }: TourCardProps) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+
   // Collect all gallery images with fallback to main image
   const galleryImages = (tour.gallery && tour.gallery.length > 0
     ? tour.gallery
@@ -205,7 +209,7 @@ export function TourCard({ tour, onBook }: TourCardProps) {
           </p>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2.5">
+        <div className={`mt-4 grid gap-2.5 ${isAdmin ? "grid-cols-1" : "grid-cols-2"}`}>
           <Link
             to="/packages/$slug"
             params={{ slug: tour.slug }}
@@ -213,22 +217,24 @@ export function TourCard({ tour, onBook }: TourCardProps) {
           >
             View Itinerary
           </Link>
-          <button
-            type="button"
-            onClick={() =>
-              onBook
-                ? onBook(tour)
-                : window.open(
-                    whatsappLink(`Hi DillKash Kashmir! I want to book: ${tour.title}`),
-                    "_blank",
-                    "noopener",
-                  )
-            }
-            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-whatsapp py-2.5 text-sm font-bold text-whatsapp-foreground transition-transform hover:scale-[1.03]"
-          >
-            <WhatsAppIcon size={15} />
-            Book Now
-          </button>
+          {!isAdmin && (
+            <button
+              type="button"
+              onClick={() =>
+                onBook
+                  ? onBook(tour)
+                  : window.open(
+                      whatsappLink(`Hi DillKash Kashmir! I want to book: ${tour.title}`),
+                      "_blank",
+                      "noopener",
+                    )
+              }
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-whatsapp py-2.5 text-sm font-bold text-whatsapp-foreground transition-transform hover:scale-[1.03]"
+            >
+              <WhatsAppIcon size={15} />
+              Book Now
+            </button>
+          )}
         </div>
       </div>
     </article>

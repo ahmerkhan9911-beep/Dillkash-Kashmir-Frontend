@@ -51,7 +51,8 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
     };
   }, [open, preselectedTour]);
 
-  if (!open) return null;
+  const isAdmin = user?.role === "admin";
+  if (!open || isAdmin) return null;
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
