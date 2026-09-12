@@ -31,8 +31,7 @@ export const Route = createFileRoute("/custom-tour")({
 
 interface CustomForm {
   date: string;
-  adults: number;
-  kids: number;
+  persons: number;
   hotel: string;
   transportPreference: string;
   destinations: string[];
@@ -41,8 +40,7 @@ interface CustomForm {
 
 const initial: CustomForm = {
   date: "",
-  adults: 2,
-  kids: 0,
+  persons: 1,
   hotel: "3 Star",
   transportPreference: "Standard Car",
   destinations: [],
@@ -67,11 +65,10 @@ function CustomTourPage() {
 
   // ── Dynamic estimated cost calculation ──
   const ADULT_BASE_COST = user?.city === "Islamabad" ? 18000 : 20000;
-  const KID_BASE_COST = Math.round(ADULT_BASE_COST * 0.6);
   const { totalEstimated } = useMemo(() => {
-    const total = Number(form.adults) * ADULT_BASE_COST + Number(form.kids) * KID_BASE_COST;
+    const total = Number(form.persons) * ADULT_BASE_COST;
     return { totalEstimated: total };
-  }, [form.adults, form.kids, ADULT_BASE_COST, KID_BASE_COST]);
+  }, [form.persons, ADULT_BASE_COST]);
 
   const toggleDestination = (name: string) =>
     setForm((f) => ({
@@ -105,8 +102,7 @@ function CustomTourPage() {
         name: user?.full_name || "",
         phoneNumber: user?.phone || "",
         preferredDate: form.date,
-        adults: form.adults,
-        kids: form.kids,
+        persons: form.persons,
         hotelPreference: form.hotel,
         transportPreference: form.transportPreference,
         preferredDestinations: form.destinations,
@@ -233,7 +229,7 @@ function CustomTourPage() {
                   </div>
                 )}
 
-                <div className="grid gap-5 sm:grid-cols-3">
+                <div className="grid gap-5 sm:grid-cols-2">
                   <div>
                     <label htmlFor="c-date" className="mb-1.5 block text-sm font-semibold text-foreground">Preferred Date</label>
                     <input
@@ -246,26 +242,14 @@ function CustomTourPage() {
                     {errors.date && <p className="mt-1 text-xs font-medium text-destructive">{errors.date}</p>}
                   </div>
                   <div>
-                    <label htmlFor="c-adults" className="mb-1.5 block text-sm font-semibold text-foreground">Adults</label>
+                    <label htmlFor="c-persons" className="mb-1.5 block text-sm font-semibold text-foreground">Travelers (Persons)</label>
                     <input
-                      id="c-adults"
+                      id="c-persons"
                       type="number"
                       min={1}
-                      max={50}
-                      value={form.adults}
-                      onChange={(e) => setForm({ ...form, adults: Number(e.target.value) })}
-                      className={inputCls()}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="c-kids" className="mb-1.5 block text-sm font-semibold text-foreground">Kids</label>
-                    <input
-                      id="c-kids"
-                      type="number"
-                      min={0}
-                      max={30}
-                      value={form.kids}
-                      onChange={(e) => setForm({ ...form, kids: Number(e.target.value) })}
+                      max={100}
+                      value={form.persons}
+                      onChange={(e) => setForm({ ...form, persons: Number(e.target.value) })}
                       className={inputCls()}
                     />
                   </div>
@@ -374,10 +358,7 @@ function CustomTourPage() {
                         Total Estimated Cost
                       </p>
                       <p className="mt-0.5 text-[11px] text-emerald-600/60 dark:text-emerald-500/50">
-                        {Number(form.adults)} adult{form.adults !== 1 ? "s" : ""} × {formatPKR(ADULT_BASE_COST)}
-                        {Number(form.kids) > 0 && (
-                          <> + {Number(form.kids)} kid{form.kids !== 1 ? "s" : ""} × {formatPKR(KID_BASE_COST)}</>
-                        )}
+                        {Number(form.persons)} person{form.persons !== 1 ? "s" : ""} × {formatPKR(ADULT_BASE_COST)}
                       </p>
                     </div>
                     <div className="text-right">

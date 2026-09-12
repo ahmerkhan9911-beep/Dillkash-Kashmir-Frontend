@@ -172,7 +172,7 @@ function MyBookingsPage() {
                             </div>
                             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                               <span className="inline-flex items-center gap-1.5"><CalendarDays size={16} /> {formatDate(b.travel_date)}</span>
-                              <span className="inline-flex items-center gap-1.5"><Users size={16} /> {b.adults} Adults{b.kids > 0 ? `, ${b.kids} Kids` : ""}</span>
+                              <span className="inline-flex items-center gap-1.5"><Users size={16} /> Total Persons: {b.persons}</span>
                               <span className="inline-flex items-center gap-1.5"><BedDouble size={16} /> {b.room_type}</span>
                             </div>
                           </div>
@@ -210,7 +210,7 @@ function MyBookingsPage() {
                             
                             <div className="grid gap-y-2 text-sm text-muted-foreground sm:grid-cols-2">
                               <span className="inline-flex items-center gap-2"><CalendarDays size={16} className="text-primary" /> {formatDate(req.preferred_date)}</span>
-                              <span className="inline-flex items-center gap-2"><Users size={16} className="text-primary" /> {req.adults} Adults{req.kids > 0 ? `, ${req.kids} Kids` : ""}</span>
+                              <span className="inline-flex items-center gap-2"><Users size={16} className="text-primary" /> Total Persons: {req.persons}</span>
                               <span className="inline-flex items-center gap-2"><Hotel size={16} className="text-primary" /> {req.hotel_preference || "Any Hotel"}</span>
                               <span className="inline-flex items-center gap-2"><Car size={16} className="text-primary" /> {req.transport_preference || "Any Transport"}</span>
                             </div>

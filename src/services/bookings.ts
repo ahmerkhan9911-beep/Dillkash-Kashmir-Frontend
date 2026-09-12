@@ -8,8 +8,7 @@ export interface BookingPayload {
   phoneNumber: string;
   selectedTour?: string;
   travelDate?: string;
-  adults?: number;
-  kids?: number;
+  persons?: number;
   room?: string;
 }
 
@@ -21,8 +20,7 @@ export interface Booking {
   email: string;
   selected_tour: string;
   travel_date: string | null;
-  adults: number;
-  kids: number;
+  persons: number;
   room_type: string;
   status: "Pending" | "Confirmed" | "Cancelled";
   created_at: string;

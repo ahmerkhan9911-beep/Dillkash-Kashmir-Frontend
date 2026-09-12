@@ -141,7 +141,7 @@ function AdminCustomTours() {
                 <div className="flex items-center gap-3">
                   <Users size={16} className="text-muted-foreground" />
                   <span className="font-medium text-foreground">
-                    {req.adults} Adults, {req.kids} Kids
+                    Total Persons: {req.persons}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">

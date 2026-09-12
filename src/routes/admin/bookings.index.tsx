@@ -190,7 +190,7 @@ function AdminBookings() {
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <Users size={12} />
-                    {b.adults} adults{b.kids > 0 ? `, ${b.kids} kids` : ""}
+                    Total Persons: {b.persons}
                   </span>
                   <span className="inline-flex items-center gap-1">
                     <BedDouble size={12} />

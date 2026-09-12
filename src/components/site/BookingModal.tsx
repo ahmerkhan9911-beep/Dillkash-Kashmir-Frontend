@@ -15,16 +15,14 @@ interface BookingModalProps {
 interface FormState {
   tour: string;
   date: string;
-  adults: number;
-  kids: number;
+  persons: number;
   room: string;
 }
 
 const initial: FormState = {
   tour: "",
   date: "",
-  adults: 2,
-  kids: 0,
+  persons: 1,
   room: "Standard Double",
 };
 
@@ -36,14 +34,13 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
   const [isSuccess, setIsSuccess] = useState(false);
 
   // ── Dynamic price calculation ──
-  const { adultPrice, kidPrice, totalPrice } = useMemo(() => {
+  const { adultPrice, totalPrice } = useMemo(() => {
     const selectedTour = tours.find((t) => t.title === form.tour);
     const isIslamabad = user?.city === "Islamabad";
     const adult = isIslamabad ? (selectedTour?.priceIslamabad ?? 25000) : (selectedTour?.priceLahore ?? 25000);
-    const kid = Math.round(adult * 0.6);
-    const total = Number(form.adults) * adult + Number(form.kids) * kid;
-    return { adultPrice: adult, kidPrice: kid, totalPrice: total };
-  }, [form.tour, form.adults, form.kids, user?.city]);
+    const total = Number(form.persons) * adult;
+    return { adultPrice: adult, totalPrice: total };
+  }, [form.tour, form.persons, user?.city]);
   const [apiError, setApiError] = useState("");
 
   useEffect(() => {
@@ -71,7 +68,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
     const e: Partial<Record<keyof FormState, string>> = {};
     if (!form.tour) e.tour = "Please select a tour";
     if (!form.date) e.date = "Please pick a travel date";
-    if (form.adults < 1) e.adults = "At least 1 adult required";
+    if (form.persons < 1) e.persons = "At least 1 person required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -89,8 +86,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
         phoneNumber: user?.phone || "",
         selectedTour: form.tour,
         travelDate: form.date || undefined,
-        adults: form.adults,
-        kids: form.kids,
+        persons: form.persons,
         room: form.room,
       });
       setIsSuccess(true);
@@ -104,7 +100,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
   };
 
   const whatsappBooking = () => {
-    const msg = `Hi DillKash Kashmir! I want to book: ${form.tour || "a Kashmir tour"}\nName: ${user?.full_name || ""}\nDate: ${form.date || "Flexible"}\nTravelers: ${form.adults} adults, ${form.kids} kids\nRoom: ${form.room}`;
+    const msg = `Hi DillKash Kashmir! I want to book: ${form.tour || "a Kashmir tour"}\nName: ${user?.full_name || ""}\nDate: ${form.date || "Flexible"}\nTravelers: ${form.persons} persons\nRoom: ${form.room}`;
     window.open(whatsappLink(msg), "_blank", "noopener");
   };
 
@@ -275,38 +271,23 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
               </div>
             </div>
 
-            {/* Adults + Kids + Room */}
-            <div className="grid grid-cols-3 gap-4">
+            {/* Persons + Room */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="bk-adults" className="mb-1.5 block text-sm font-semibold text-foreground">
-                  Adults
+                <label htmlFor="bk-persons" className="mb-1.5 block text-sm font-semibold text-foreground">
+                  Total Persons
                 </label>
                 <input
-                  id="bk-adults"
+                  id="bk-persons"
                   type="number"
                   min={1}
-                  max={50}
-                  value={form.adults}
-                  onChange={(e) => set("adults", Number(e.target.value))}
-                  className={inputCls(errors.adults)}
+                  max={100}
+                  value={form.persons}
+                  onChange={(e) => set("persons", Number(e.target.value))}
+                  className={inputCls(errors.persons)}
                   disabled={isSubmitting}
                 />
-                {errors.adults && <p className="mt-1 text-xs font-medium text-destructive">{errors.adults}</p>}
-              </div>
-              <div>
-                <label htmlFor="bk-kids" className="mb-1.5 block text-sm font-semibold text-foreground">
-                  Kids
-                </label>
-                <input
-                  id="bk-kids"
-                  type="number"
-                  min={0}
-                  max={30}
-                  value={form.kids}
-                  onChange={(e) => set("kids", Number(e.target.value))}
-                  className={inputCls()}
-                  disabled={isSubmitting}
-                />
+                {errors.persons && <p className="mt-1 text-xs font-medium text-destructive">{errors.persons}</p>}
               </div>
               <div>
                 <label htmlFor="bk-room" className="mb-1.5 block text-sm font-semibold text-foreground">
@@ -338,10 +319,7 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
                     Total Amount
                   </p>
                   <p className="mt-0.5 text-[11px] text-emerald-600/60 dark:text-emerald-500/50">
-                    {Number(form.adults)} adult{form.adults !== 1 ? "s" : ""} × {formatPKR(adultPrice)}
-                    {Number(form.kids) > 0 && (
-                      <> + {Number(form.kids)} kid{form.kids !== 1 ? "s" : ""} × {formatPKR(kidPrice)}</>
-                    )}
+                    {Number(form.persons)} person{form.persons !== 1 ? "s" : ""} × {formatPKR(adultPrice)}
                   </p>
                 </div>
                 <div className="text-right">
