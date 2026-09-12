@@ -70,11 +70,11 @@ function PackagesPage() {
     let list = tours.slice();
     if (duration !== "All") list = list.filter((t) => t.durationDays === Number(duration));
     if (type !== "All") list = list.filter((t) => t.type.includes(type as Tour["type"][number]));
-    if (budget === "Under 20k") list = list.filter((t) => t.price < 20000);
-    if (budget === "20k – 30k") list = list.filter((t) => t.price >= 20000 && t.price <= 30000);
-    if (budget === "Above 30k") list = list.filter((t) => t.price > 30000);
-    if (sort === "Price: Low to High") list.sort((a, b) => a.price - b.price);
-    if (sort === "Price: High to Low") list.sort((a, b) => b.price - a.price);
+    if (budget === "Under 20k") list = list.filter((t) => t.priceLahore < 20000);
+    if (budget === "20k – 30k") list = list.filter((t) => t.priceLahore >= 20000 && t.priceLahore <= 30000);
+    if (budget === "Above 30k") list = list.filter((t) => t.priceLahore > 30000);
+    if (sort === "Price: Low to High") list.sort((a, b) => a.priceLahore - b.priceLahore);
+    if (sort === "Price: High to Low") list.sort((a, b) => b.priceLahore - a.priceLahore);
     if (sort === "Popular") list.sort((a, b) => b.reviews - a.reviews);
     return list;
   }, [duration, type, budget, sort, tours]);

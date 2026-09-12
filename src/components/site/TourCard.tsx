@@ -14,6 +14,8 @@ interface TourCardProps {
 export function TourCard({ tour, onBook }: TourCardProps) {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const city = user?.city === "Islamabad" ? "Islamabad" : "Lahore";
+  const displayPrice = city === "Islamabad" ? tour.priceIslamabad : tour.priceLahore;
 
   // Collect all gallery images with fallback to main image
   const galleryImages = (tour.gallery && tour.gallery.length > 0
@@ -200,7 +202,7 @@ export function TourCard({ tour, onBook }: TourCardProps) {
               Starting from
             </p>
             <p className="font-heading text-xl font-extrabold text-primary">
-              {formatPKR(tour.price)}
+              {formatPKR(displayPrice)}
             </p>
           </div>
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">

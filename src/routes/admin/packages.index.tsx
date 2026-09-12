@@ -119,7 +119,7 @@ function AdminPackages() {
                 </div>
                 <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
                   <span>{pkg.durationDays} Days</span>
-                  <span>{formatPKR(pkg.price)}</span>
+                  <span>{formatPKR(pkg.priceLahore)}</span>
                   <span>★ {pkg.rating}</span>
                   <span>{pkg.type?.join(", ")}</span>
                 </div>

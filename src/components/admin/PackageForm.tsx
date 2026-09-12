@@ -10,7 +10,8 @@ export interface PackageFormData {
   full_description: string;
   duration_days: number;
   package_type: string;
-  price: number;
+  price_lahore: number;
+  price_islamabad: number;
   rating: number;
   reviews_count: number;
   image_url: string;
@@ -31,7 +32,7 @@ export interface PackageFormData {
 
 const emptyForm: PackageFormData = {
   title: "", slug: "", short_description: "", full_description: "",
-  duration_days: 3, package_type: "Family", price: 0, rating: 0,
+  duration_days: 3, package_type: "Family", price_lahore: 0, price_islamabad: 0, rating: 0,
   reviews_count: 0, image_url: "", departure_city: "Lahore",
   departure_day: "", transport: "", accommodation: "", meals: "",
   featured: false, is_active: true, next_departure: "",
@@ -100,7 +101,8 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
     if (!form.title.trim()) { setError("Package title is required"); return; }
     if (!form.short_description.trim()) { setError("Short description is required"); return; }
     if (form.duration_days < 1) { setError("Duration must be at least 1 day"); return; }
-    if (form.price <= 0) { setError("Price must be greater than 0"); return; }
+    if (form.price_lahore <= 0) { setError("Lahore price must be greater than 0"); return; }
+    if (form.price_islamabad <= 0) { setError("Islamabad price must be greater than 0"); return; }
 
     // Clean arrays (remove empty strings)
     const cleaned: PackageFormData = {
@@ -165,8 +167,12 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
             <input value={form.package_type} onChange={(e) => set("package_type", e.target.value)} className={inputCls} placeholder="Family,Couples,Budget" />
           </div>
           <div>
-            <label className={labelCls}>Price (PKR) *</label>
-            <input type="number" min={0} value={form.price} onChange={(e) => set("price", Number(e.target.value))} className={inputCls} />
+            <label className={labelCls}>Price — Lahore (PKR) *</label>
+            <input type="number" min={0} value={form.price_lahore} onChange={(e) => set("price_lahore", Number(e.target.value))} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Price — Islamabad (PKR) *</label>
+            <input type="number" min={0} value={form.price_islamabad} onChange={(e) => set("price_islamabad", Number(e.target.value))} className={inputCls} />
           </div>
           <div>
             <label className={labelCls}>Rating</label>

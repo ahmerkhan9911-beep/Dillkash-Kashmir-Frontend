@@ -47,6 +47,7 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
     full_name: "",
     email: "",
     phone: "",
+    city: "Lahore",
     password: "",
     confirm_password: "",
   });
@@ -393,6 +394,27 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
                   />
                 </div>
                 <FieldError msg={fieldErrors.phone} />
+              </div>
+
+              {/* City */}
+              <div>
+                <label htmlFor="su-city" className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Your City
+                </label>
+                <div className="relative">
+                  <InputIcon><MapPin size={16} /></InputIcon>
+                  <select
+                    id="su-city"
+                    value={signupForm.city}
+                    onChange={(e) => set("city", e.target.value)}
+                    className={inputCls()}
+                    style={{ paddingLeft: "2.75rem" }}
+                  >
+                    <option value="Lahore">Lahore</option>
+                    <option value="Islamabad">Islamabad</option>
+                  </select>
+                </div>
+                <p className="mt-1 text-[11px] text-slate-400">Pricing & pickup points are based on your city</p>
               </div>
 
               {/* Password */}

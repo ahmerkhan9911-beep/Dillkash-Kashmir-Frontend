@@ -14,7 +14,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import { formatPKR, pickupPoints, site, tours as staticTours, whatsappLink, type Tour } from "@/data/site";
+import { formatPKR, getPickupPointsForCity, site, tours as staticTours, whatsappLink, type Tour } from "@/data/site";
 import { getPackageBySlug } from "@/services/packages";
 import { StarRating } from "@/components/site/StarRating";
 import { BookingModal } from "@/components/site/BookingModal";
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/packages/$slug")({
           { title: `${loaderData.tour.title} — DillKash Kashmir` },
           {
             name: "description",
-            content: `${loaderData.tour.short} ${loaderData.tour.durationDays}-day all-inclusive tour from Lahore starting at ${formatPKR(loaderData.tour.price)}.`,
+            content: `${loaderData.tour.short} ${loaderData.tour.durationDays}-day all-inclusive tour from Lahore starting at ${formatPKR(loaderData.tour.priceLahore)}.`,
           },
           { property: "og:title", content: `${loaderData.tour.title} — DillKash Kashmir` },
           { property: "og:description", content: loaderData.tour.short },
@@ -45,9 +45,9 @@ export const Route = createFileRoute("/packages/$slug")({
   component: TourDetailPage,
 });
 
-const quickInfo = (tour: Tour) => [
+const quickInfo = (tour: Tour, city: string) => [
   { icon: Clock, label: "Duration", value: `${tour.durationDays} Days / ${tour.durationDays - 1} Nights` },
-  { icon: MapPin, label: "Departure", value: "Lahore (Thokar, Kalma Chowk, Ring Road)" },
+  { icon: MapPin, label: "Departure", value: city === "Islamabad" ? "Islamabad (Faizabad, 26 Number)" : "Lahore (Thokar, Kalma Chowk, Ring Road)" },
   { icon: Bus, label: "Transportation", value: tour.transport },
   { icon: BedDouble, label: "Accommodation", value: tour.accommodation },
   { icon: HandPlatter, label: "Meals", value: tour.meals },
@@ -126,6 +126,9 @@ function TourDetailPage() {
   const [loading, setLoading] = useState(!loaderData.tour);
   const [modalOpen, setModalOpen] = useState(false);
   const { user } = useAuth();
+  const city = user?.city === "Islamabad" ? "Islamabad" : "Lahore";
+  const points = getPickupPointsForCity(city);
+  const displayPrice = city === "Islamabad" ? tour?.priceIslamabad : tour?.priceLahore;
 
   // Fetch from API (richer data with itinerary details)
   useEffect(() => {
@@ -171,7 +174,7 @@ function TourDetailPage() {
               <Clock size={14} /> {tour.durationDays} Days
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 backdrop-blur">
-              <MapPin size={14} /> Departs Lahore
+              <MapPin size={14} /> Departs {city}
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3.5 py-1.5 backdrop-blur">
               <Calendar size={14} /> Next: {tour.nextDeparture}
@@ -186,7 +189,7 @@ function TourDetailPage() {
                 Starting from
               </span>
               <span className="font-heading text-2xl font-extrabold text-white">
-                {formatPKR(tour.price)}
+                {formatPKR(displayPrice ?? 0)}
               </span>
             </p>
             {user?.role === 'user' && (
@@ -217,7 +220,7 @@ function TourDetailPage() {
         {/* Quick info */}
         <Reveal>
           <div className="grid gap-4 rounded-3xl border border-border bg-card p-6 shadow-soft sm:grid-cols-2 lg:grid-cols-3">
-            {quickInfo(tour).map((q) => (
+            {quickInfo(tour, city).map((q) => (
               <div key={q.label} className="flex items-start gap-3">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
                   <q.icon size={19} />
@@ -280,10 +283,10 @@ function TourDetailPage() {
         {/* Pickup points */}
         <Reveal className="mt-14">
           <h2 className="font-heading text-2xl font-extrabold text-foreground sm:text-3xl">
-            Lahore Pickup Points
+            {city} Pickup Points
           </h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            {pickupPoints.map((p) => (
+            {points.map((p) => (
               <div key={p.name} className="card-hover rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-secondary text-primary">
                   <MapPin size={20} />

@@ -12,7 +12,8 @@ interface PackageFromAPI {
   full_description: string;
   duration_days: number;
   package_type: string;
-  price: number;
+  price_lahore: number;
+  price_islamabad: number;
   rating: number;
   reviews_count: number;
   image_url: string;
@@ -53,7 +54,8 @@ function toTour(pkg: PackageFromAPI): Tour {
     short: pkg.short_description,
     durationDays: pkg.duration_days,
     type: typeArr,
-    price: Number(pkg.price),
+    priceLahore: Number(pkg.price_lahore),
+    priceIslamabad: Number(pkg.price_islamabad),
     rating: Number(pkg.rating),
     reviews: pkg.reviews_count,
     image,

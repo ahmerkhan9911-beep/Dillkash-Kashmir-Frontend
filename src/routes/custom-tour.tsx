@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Check, Send, Car, Truck, Bus, LogIn, Shield } from "lucide-react";
-import { destinations, whatsappLink } from "@/data/site";
+import { destinations, whatsappLink, formatPKR } from "@/data/site";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { images } from "@/data/site";
@@ -64,6 +64,14 @@ function CustomTourPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState("");
+
+  // ── Dynamic estimated cost calculation ──
+  const ADULT_BASE_COST = user?.city === "Islamabad" ? 18000 : 20000;
+  const KID_BASE_COST = Math.round(ADULT_BASE_COST * 0.6);
+  const { totalEstimated } = useMemo(() => {
+    const total = Number(form.adults) * ADULT_BASE_COST + Number(form.kids) * KID_BASE_COST;
+    return { totalEstimated: total };
+  }, [form.adults, form.kids, ADULT_BASE_COST, KID_BASE_COST]);
 
   const toggleDestination = (name: string) =>
     setForm((f) => ({
@@ -353,6 +361,37 @@ function CustomTourPage() {
                     placeholder="Anything special — anniversary, wheelchair access, corporate branding, specific hotels…"
                     className={inputCls()}
                   />
+                </div>
+
+                {/* ── Total Estimated Cost Display ── */}
+                <div
+                  className="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-r from-emerald-50 via-emerald-50/80 to-teal-50 p-4 dark:border-emerald-800/40 dark:from-emerald-950/40 dark:via-emerald-950/30 dark:to-teal-950/30"
+                >
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-200/20 blur-2xl dark:bg-emerald-500/10" />
+                  <div className="relative flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700/70 dark:text-emerald-400/70">
+                        Total Estimated Cost
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-emerald-600/60 dark:text-emerald-500/50">
+                        {Number(form.adults)} adult{form.adults !== 1 ? "s" : ""} × {formatPKR(ADULT_BASE_COST)}
+                        {Number(form.kids) > 0 && (
+                          <> + {Number(form.kids)} kid{form.kids !== 1 ? "s" : ""} × {formatPKR(KID_BASE_COST)}</>
+                        )}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-heading text-2xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
+                        {formatPKR(totalEstimated)}
+                      </p>
+                      <p className="mt-1 text-[10px] text-emerald-600/70 dark:text-emerald-400/60">
+                        Estimated from {user?.city || "Lahore"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="relative mt-2.5 text-[11px] leading-relaxed text-emerald-600/70 dark:text-emerald-500/50">
+                    *This is an estimated base cost. Final quote will be provided by our tour planners.
+                  </p>
                 </div>
 
                 <button

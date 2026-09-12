@@ -27,6 +27,7 @@ function SignupPage() {
     full_name: "",
     email: "",
     phone: "",
+    city: "Lahore",
     password: "",
     confirm_password: "",
   });
@@ -172,6 +173,22 @@ function SignupPage() {
                 className={inputCls("phone")}
               />
               {fieldErrors["phone"] && <p className="mt-1 text-xs font-medium text-destructive">{fieldErrors["phone"]}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="su-city" className="mb-1.5 block text-sm font-semibold text-foreground">
+                Your City
+              </label>
+              <select
+                id="su-city"
+                value={form.city}
+                onChange={(e) => set("city", e.target.value)}
+                className={inputCls("city")}
+              >
+                <option value="Lahore">Lahore</option>
+                <option value="Islamabad">Islamabad</option>
+              </select>
+              <p className="mt-1 text-[11px] text-muted-foreground">Pricing & pickup points are based on your city</p>
             </div>
 
             <div>

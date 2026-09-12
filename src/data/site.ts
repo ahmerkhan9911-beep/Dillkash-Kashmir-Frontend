@@ -54,7 +54,8 @@ export interface Tour {
   short: string;
   durationDays: number;
   type: ("Family" | "Couples" | "Honeymoon" | "Corporate" | "Group" | "Budget")[];
-  price: number;
+  priceLahore: number;
+  priceIslamabad: number;
   rating: number;
   reviews: number;
   image: string;
@@ -88,6 +89,23 @@ export const pickupPoints = [
   },
 ];
 
+export const pickupPointsIslamabad = [
+  {
+    name: "Faizabad",
+    detail: "Main Islamabad pickup — near Faizabad Interchange",
+    time: "2:30 AM",
+  },
+  {
+    name: "26 Number Chungi / Kashmir Highway",
+    detail: "Convenient stop on Kashmir Highway heading towards Muzaffarabad",
+    time: "3:00 AM",
+  },
+];
+
+export function getPickupPointsForCity(city?: string) {
+  return city === "Islamabad" ? pickupPointsIslamabad : pickupPoints;
+}
+
 export const tours: Tour[] = [
   {
     slug: "neelum-keran-3-days",
@@ -95,7 +113,8 @@ export const tours: Tour[] = [
     short: "Ideal for quick weekend trips from Lahore.",
     durationDays: 3,
     type: ["Family", "Couples", "Budget"],
-    price: 14500,
+    priceLahore: 14500,
+    priceIslamabad: 12500,
     rating: 4.8,
     reviews: 212,
     image: keran,
@@ -160,7 +179,8 @@ export const tours: Tour[] = [
     short: "The full Neelum Valley experience — rivers, waterfalls & Arang Kel.",
     durationDays: 5,
     type: ["Family", "Couples", "Honeymoon", "Group"],
-    price: 24500,
+    priceLahore: 24500,
+    priceIslamabad: 22000,
     rating: 4.9,
     reviews: 348,
     image: arangKel,
@@ -238,7 +258,8 @@ export const tours: Tour[] = [
     short: "Ratti Gali Lake, Taobat & Baboon Valley — the wild side of AJK.",
     durationDays: 7,
     type: ["Group", "Corporate", "Family"],
-    price: 36500,
+    priceLahore: 36500,
+    priceIslamabad: 33500,
     rating: 4.9,
     reviews: 187,
     image: rattiGali,
@@ -274,7 +295,8 @@ export const tours: Tour[] = [
     short: "Private riverside rooms & romantic evenings in Keran & Sharda.",
     durationDays: 4,
     type: ["Honeymoon", "Couples"],
-    price: 29500,
+    priceLahore: 29500,
+    priceIslamabad: 27000,
     rating: 4.8,
     reviews: 96,
     image: neelumRiver,
@@ -306,7 +328,8 @@ export const tours: Tour[] = [
     short: "Slow-paced, kid-friendly tour with verified family hotels.",
     durationDays: 5,
     type: ["Family", "Budget"],
-    price: 21500,
+    priceLahore: 21500,
+    priceIslamabad: 19500,
     rating: 4.7,
     reviews: 154,
     image: sharda,
@@ -338,7 +361,8 @@ export const tours: Tour[] = [
     short: "Team-building in the mountains with dedicated coordinators.",
     durationDays: 3,
     type: ["Corporate", "Group"],
-    price: 18500,
+    priceLahore: 18500,
+    priceIslamabad: 16500,
     rating: 4.8,
     reviews: 63,
     image: muzaffarabad,

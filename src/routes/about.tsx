@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Users,
 } from "lucide-react";
-import { images, pickupPoints } from "@/data/site";
+import { images, getPickupPointsForCity } from "@/data/site";
+import { useAuth } from "@/context/AuthContext";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
 
@@ -57,6 +58,9 @@ const trust = [
 ];
 
 function AboutPage() {
+  const { user } = useAuth();
+  const city = user?.city === "Islamabad" ? "Islamabad" : "Lahore";
+  const points = getPickupPointsForCity(city);
   const [guides, setGuides] = useState<Guide[]>([]);
 
   useEffect(() => {
@@ -265,12 +269,12 @@ function AboutPage() {
             <SectionHeader
               dark
               eyebrow="Departures"
-              title="Weekly Departures from Lahore"
+              title={`Weekly Departures from ${city}`}
               subtitle="Three pickup points across the city, on-time departures, and a tour manager waiting to welcome you aboard."
             />
           </Reveal>
           <div className="mt-12 grid gap-4 sm:grid-cols-3">
-            {pickupPoints.map((p, i) => (
+            {points.map((p, i) => (
               <Reveal key={p.name} delay={i * 80}>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
                   <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/20 text-primary">

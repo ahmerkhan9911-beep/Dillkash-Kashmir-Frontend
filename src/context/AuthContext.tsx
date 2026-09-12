@@ -8,6 +8,7 @@ export interface AuthUser {
   full_name: string;
   email: string;
   phone: string;
+  city: "Lahore" | "Islamabad";
   role: "user" | "admin";
 }
 
@@ -25,6 +26,7 @@ interface SignupData {
   full_name: string;
   email: string;
   phone: string;
+  city: string;
   password: string;
   confirm_password: string;
 }

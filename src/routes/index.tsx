@@ -18,11 +18,13 @@ import {
   Users,
   Wallet,
   BadgeCheck,
+  X,
 } from "lucide-react";
 import {
   destinations,
   images,
   pickupPoints,
+  getPickupPointsForCity,
   reviews,
   site,
   tours,
@@ -37,7 +39,9 @@ import { BookingModal } from "@/components/site/BookingModal";
 import { WhatsAppIcon } from "@/components/site/Navbar";
 import { DestinationGalleryModal } from "@/components/site/DestinationGalleryModal";
 import { getDestinations, type DestinationItem } from "@/services/destinations";
+import promoVideo from "@/assets/dillkashkashmirvideo.mp4";
 import InteractiveMountain2D from "@/components/site/InteractiveMountain2D";
+import { useAuth } from "@/context/AuthContext";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -467,6 +471,8 @@ function Inclusions() {
 /* --------------------------- Video section --------------------------- */
 
 function VideoSection() {
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
   return (
     <section className="relative overflow-hidden">
       <img
@@ -490,7 +496,8 @@ function VideoSection() {
           <button
             type="button"
             aria-label="Play Kashmir experience video"
-            className="group mx-auto mt-8 grid h-20 w-20 place-items-center rounded-full bg-primary text-primary-foreground shadow-cta transition-transform hover:scale-110"
+            onClick={() => setIsVideoOpen(true)}
+            className="group mx-auto mt-8 grid h-20 w-20 place-items-center rounded-full bg-primary text-primary-foreground shadow-cta transition-all duration-300 hover:scale-110 hover:shadow-[0_0_20px_#10b981]"
           >
             <Play size={30} className="ml-1 fill-current" />
           </button>
@@ -505,6 +512,32 @@ function VideoSection() {
           </div>
         </Reveal>
       </div>
+
+      {isVideoOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md md:p-10 animate-in fade-in duration-300"
+          onClick={() => setIsVideoOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-5xl aspect-video overflow-hidden rounded-2xl border border-primary/30 shadow-[0_0_40px_rgba(16,185,129,0.3)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsVideoOpen(false)}
+              className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-black/50 text-white transition-colors hover:bg-black"
+            >
+              <X size={24} />
+            </button>
+            <video
+              src={promoVideo}
+              controls
+              autoPlay
+              playsInline
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
@@ -595,7 +628,11 @@ function Testimonials() {
 
 /* ------------------------- Lahore departures ------------------------- */
 
-function LahoreDepartures() {
+function DeparturePoints() {
+  const { user } = useAuth();
+  const city = user?.city === "Islamabad" ? "Islamabad" : "Lahore";
+  const points = getPickupPointsForCity(city);
+
   return (
     <section className="bg-foreground py-20 text-primary-foreground sm:py-24">
       <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
@@ -604,12 +641,12 @@ function LahoreDepartures() {
             align="left"
             dark
             eyebrow="Departures"
-            title="Your Kashmir Journey Starts in Lahore"
-            subtitle="Three convenient pickup points across the city — park your car safely and hop on. Our coasters leave on time, every time."
+            title={`Your Kashmir Journey Starts in ${city}`}
+            subtitle={`Convenient pickup points across ${city} — park your car safely and hop on. Our coasters leave on time, every time.`}
           />
           <div className="mt-8">
             <a
-              href={whatsappLink("Hi DillKash Kashmir! Please share the next departure availability from Lahore.")}
+              href={whatsappLink(`Hi DillKash Kashmir! Please share the next departure availability from ${city}.`)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-cta transition-transform hover:scale-105"
@@ -621,7 +658,7 @@ function LahoreDepartures() {
         </Reveal>
         <Reveal delay={120}>
           <div className="grid gap-4">
-            {pickupPoints.map((p, i) => (
+            {points.map((p, i) => (
               <div
                 key={p.name}
                 className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur transition-colors hover:border-primary/50"
@@ -718,7 +755,7 @@ function HomePage() {
       <Inclusions />
       <VideoSection />
       <Testimonials />
-      <LahoreDepartures />
+      <DeparturePoints />
       <CustomTourCTA />
       <BookingModal
         open={modalOpen}

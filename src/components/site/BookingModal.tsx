@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { X, Loader2, CheckCircle2, LogIn } from "lucide-react";
-import { tours, whatsappLink, type Tour } from "@/data/site";
+import { tours, whatsappLink, formatPKR, type Tour } from "@/data/site";
 import { WhatsAppIcon } from "./Navbar";
 import { submitBooking } from "@/services/bookings";
 import { useAuth } from "@/context/AuthContext";
@@ -34,6 +34,16 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  // ── Dynamic price calculation ──
+  const { adultPrice, kidPrice, totalPrice } = useMemo(() => {
+    const selectedTour = tours.find((t) => t.title === form.tour);
+    const isIslamabad = user?.city === "Islamabad";
+    const adult = isIslamabad ? (selectedTour?.priceIslamabad ?? 25000) : (selectedTour?.priceLahore ?? 25000);
+    const kid = Math.round(adult * 0.6);
+    const total = Number(form.adults) * adult + Number(form.kids) * kid;
+    return { adultPrice: adult, kidPrice: kid, totalPrice: total };
+  }, [form.tour, form.adults, form.kids, user?.city]);
   const [apiError, setApiError] = useState("");
 
   useEffect(() => {
@@ -314,6 +324,34 @@ export function BookingModal({ open, onClose, preselectedTour }: BookingModalPro
                   <option>Deluxe Double</option>
                   <option>Shared (Budget)</option>
                 </select>
+              </div>
+            </div>
+
+            {/* ── Total Price Display ── */}
+            <div
+              className="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-r from-emerald-50 via-emerald-50/80 to-teal-50 p-4 dark:border-emerald-800/40 dark:from-emerald-950/40 dark:via-emerald-950/30 dark:to-teal-950/30"
+            >
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-200/20 blur-2xl dark:bg-emerald-500/10" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700/70 dark:text-emerald-400/70">
+                    Total Amount
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-emerald-600/60 dark:text-emerald-500/50">
+                    {Number(form.adults)} adult{form.adults !== 1 ? "s" : ""} × {formatPKR(adultPrice)}
+                    {Number(form.kids) > 0 && (
+                      <> + {Number(form.kids)} kid{form.kids !== 1 ? "s" : ""} × {formatPKR(kidPrice)}</>
+                    )}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-heading text-2xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
+                    {formatPKR(totalPrice)}
+                  </p>
+                  <p className="mt-1 text-[10px] text-emerald-600/70 dark:text-emerald-400/60">
+                    Price based on your city: {user?.city || "Lahore"}
+                  </p>
+                </div>
               </div>
             </div>
 
