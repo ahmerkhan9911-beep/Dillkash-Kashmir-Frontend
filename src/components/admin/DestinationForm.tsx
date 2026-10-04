@@ -137,7 +137,8 @@ export function DestinationForm({
               type="number"
               min={0}
               value={form.sort_order}
-              onChange={(e) => set("sort_order", Number(e.target.value))}
+              onChange={(e) => set("sort_order", e.target.value === "" ? 0 : Number(e.target.value))}
+              onFocus={(e) => e.target.select()}
               className={inputCls}
               placeholder="0 (Lower numbers appear first)"
             />

@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type React from "react";
-import { Loader2, Trash2, CheckCircle2, XCircle, Clock, CalendarDays, Users, BedDouble, Mail } from "lucide-react";
+import { Loader2, Trash2, CheckCircle2, XCircle, Clock, CalendarDays, Users, BedDouble, Mail, TicketPercent } from "lucide-react";
 import { getAllBookings, updateBookingStatus, deleteBooking, type Booking } from "@/services/bookings";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
+import { formatPKR } from "@/data/site";
 
 export const Route = createFileRoute("/admin/bookings/")({
   component: AdminBookings,
@@ -200,6 +201,29 @@ function AdminBookings() {
                     🕒 {formatDate(b.created_at)}
                   </span>
                 </div>
+
+                {/* Pricing + promo */}
+                {(b.total_price != null || b.applied_promo) && (
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+                    {b.total_price != null && (
+                      <span className="font-bold text-foreground">
+                        {b.applied_promo && b.discount_amount != null && (
+                          <span className="mr-1.5 font-medium text-gray-400 line-through">
+                            {formatPKR(b.total_price + b.discount_amount)}
+                          </span>
+                        )}
+                        {formatPKR(b.total_price)}
+                      </span>
+                    )}
+                    {b.applied_promo && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                        <TicketPercent size={11} />
+                        {b.applied_promo}
+                        {b.discount_amount != null && <> · −{formatPKR(b.discount_amount)}</>}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Right: actions */}

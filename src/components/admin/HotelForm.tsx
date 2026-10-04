@@ -174,7 +174,8 @@ export function HotelForm({
             type="number"
             min={0}
             value={form.pricePerNight || ""}
-            onChange={(e) => set("pricePerNight", Number(e.target.value))}
+            onChange={(e) => set("pricePerNight", e.target.value === "" ? 0 : Number(e.target.value))}
+            onFocus={(e) => e.target.select()}
             placeholder="e.g. 15000"
             className={inputCls}
           />

@@ -249,7 +249,8 @@ function CustomTourPage() {
                       min={1}
                       max={100}
                       value={form.persons}
-                      onChange={(e) => setForm({ ...form, persons: Number(e.target.value) })}
+                      onChange={(e) => setForm({ ...form, persons: e.target.value === "" ? 1 : Number(e.target.value) })}
+                      onFocus={(e) => e.target.select()}
                       className={inputCls()}
                     />
                   </div>

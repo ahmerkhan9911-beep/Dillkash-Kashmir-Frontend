@@ -38,6 +38,7 @@ import { Route as AdminHotelsIndexRouteImport } from './routes/admin/hotels.inde
 import { Route as AdminHotelsCreateRouteImport } from './routes/admin/hotels.create'
 import { Route as AdminPackagesIndexRouteImport } from './routes/admin/packages.index'
 import { Route as AdminPackagesCreateRouteImport } from './routes/admin/packages.create'
+import { Route as AdminPromoCodesIndexRouteImport } from './routes/admin/promo-codes.index'
 import { Route as AdminBlogsIdEditRouteImport } from './routes/admin/blogs.$id.edit'
 import { Route as AdminDestinationsIdEditRouteImport } from './routes/admin/destinations.$id.edit'
 import { Route as AdminHotelsIdEditRouteImport } from './routes/admin/hotels.$id.edit'
@@ -188,6 +189,11 @@ const AdminPackagesCreateRoute = AdminPackagesCreateRouteImport.update({
   path: '/create',
   getParentRoute: () => AdminPackagesRoute,
 } as any)
+const AdminPromoCodesIndexRoute = AdminPromoCodesIndexRouteImport.update({
+  id: '/promo-codes/',
+  path: '/promo-codes/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminBlogsIdEditRoute = AdminBlogsIdEditRouteImport.update({
   id: '/$id/edit',
   path: '/$id/edit',
@@ -239,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
+  '/admin/promo-codes/': typeof AdminPromoCodesIndexRoute
   '/admin/blogs/$id/edit': typeof AdminBlogsIdEditRoute
   '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
   '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/admin/guides': typeof AdminGuidesIndexRoute
   '/admin/hotels': typeof AdminHotelsIndexRoute
   '/admin/packages': typeof AdminPackagesIndexRoute
+  '/admin/promo-codes': typeof AdminPromoCodesIndexRoute
   '/admin/blogs/$id/edit': typeof AdminBlogsIdEditRoute
   '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
   '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
+  '/admin/promo-codes/': typeof AdminPromoCodesIndexRoute
   '/admin/blogs/$id/edit': typeof AdminBlogsIdEditRoute
   '/admin/destinations/$id/edit': typeof AdminDestinationsIdEditRoute
   '/admin/hotels/$id/edit': typeof AdminHotelsIdEditRoute
@@ -342,6 +351,7 @@ export interface FileRouteTypes {
     | '/admin/guides/'
     | '/admin/hotels/'
     | '/admin/packages/'
+    | '/admin/promo-codes/'
     | '/admin/blogs/$id/edit'
     | '/admin/destinations/$id/edit'
     | '/admin/hotels/$id/edit'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/admin/guides'
     | '/admin/hotels'
     | '/admin/packages'
+    | '/admin/promo-codes'
     | '/admin/blogs/$id/edit'
     | '/admin/destinations/$id/edit'
     | '/admin/hotels/$id/edit'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/admin/guides/'
     | '/admin/hotels/'
     | '/admin/packages/'
+    | '/admin/promo-codes/'
     | '/admin/blogs/$id/edit'
     | '/admin/destinations/$id/edit'
     | '/admin/hotels/$id/edit'
@@ -633,6 +645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPackagesCreateRouteImport
       parentRoute: typeof AdminPackagesRoute
     }
+    '/admin/promo-codes/': {
+      id: '/admin/promo-codes/'
+      path: '/promo-codes'
+      fullPath: '/admin/promo-codes/'
+      preLoaderRoute: typeof AdminPromoCodesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/blogs/$id/edit': {
       id: '/admin/blogs/$id/edit'
       path: '/$id/edit'
@@ -722,6 +741,7 @@ interface AdminRouteChildren {
   AdminCustomToursIndexRoute: typeof AdminCustomToursIndexRoute
   AdminDestinationsIndexRoute: typeof AdminDestinationsIndexRoute
   AdminGuidesIndexRoute: typeof AdminGuidesIndexRoute
+  AdminPromoCodesIndexRoute: typeof AdminPromoCodesIndexRoute
   AdminDestinationsIdEditRoute: typeof AdminDestinationsIdEditRoute
 }
 
@@ -735,6 +755,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCustomToursIndexRoute: AdminCustomToursIndexRoute,
   AdminDestinationsIndexRoute: AdminDestinationsIndexRoute,
   AdminGuidesIndexRoute: AdminGuidesIndexRoute,
+  AdminPromoCodesIndexRoute: AdminPromoCodesIndexRoute,
   AdminDestinationsIdEditRoute: AdminDestinationsIdEditRoute,
 }
 

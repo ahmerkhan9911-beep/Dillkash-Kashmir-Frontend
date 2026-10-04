@@ -137,3 +137,9 @@ export async function getAdminStats() {
     pendingCustomTours: number;
   }>("/packages/admin/stats");
 }
+
+/** Fetch all unique destination names across packages (admin-only). */
+export async function getUniqueDestinations(): Promise<string[]> {
+  const data = await api<{ destinations: string[] }>("/packages/unique-destinations");
+  return data.destinations;
+}

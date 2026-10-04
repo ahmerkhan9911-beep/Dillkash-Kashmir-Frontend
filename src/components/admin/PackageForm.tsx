@@ -1,7 +1,9 @@
-import { useState, useCallback } from "react";
-import { Plus, Trash2, Loader2, Save, Upload } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import { Plus, Trash2, Loader2, Save, Upload, ChevronDown } from "lucide-react";
 import { ImageUploader } from "./ImageUploader";
 import { GalleryUploader } from "./GalleryUploader";
+import { CreatableSelect } from "./CreatableSelect";
+import { getUniqueDestinations } from "@/services/packages";
 
 export interface PackageFormData {
   title: string;
@@ -30,13 +32,21 @@ export interface PackageFormData {
   gallery: string[];
 }
 
+/* ── Dropdown option constants ───────────────────────────────────────── */
+const DURATION_OPTIONS = [3, 5, 7] as const;
+const PACKAGE_TYPE_OPTIONS = ["Family", "Honeymoon", "Adventure", "Corporate", "Standard"] as const;
+const DEPARTURE_CITY_OPTIONS = ["Lahore", "Islamabad"] as const;
+const DEPARTURE_DAY_OPTIONS = [
+  "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Everyday",
+] as const;
+
 const emptyForm: PackageFormData = {
   title: "", slug: "", short_description: "", full_description: "",
-  duration_days: 3, package_type: "Family", price_lahore: 0, price_islamabad: 0, rating: 0,
-  reviews_count: 0, image_url: "", departure_city: "Lahore",
-  departure_day: "", transport: "", accommodation: "", meals: "",
+  duration_days: 3, package_type: "Family", price_lahore: 0, price_islamabad: 0,
+  rating: 5, reviews_count: 0, image_url: "", departure_city: "Lahore",
+  departure_day: "Friday", transport: "", accommodation: "", meals: "",
   featured: false, is_active: true, next_departure: "",
-  destinations: [""], itinerary: [{ day: 1, title: "", details: [""] }],
+  destinations: [], itinerary: [{ day: 1, title: "", details: [""] }],
   included: [""], notIncluded: [""], gallery: [],
 };
 
@@ -52,6 +62,18 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
   const [error, setError] = useState("");
   const [uploadingCount, setUploadingCount] = useState(0);
 
+  /* ── Destination suggestions from the backend ────────────────────── */
+  const [destSuggestions, setDestSuggestions] = useState<string[]>([]);
+  const [destLoading, setDestLoading] = useState(false);
+
+  useEffect(() => {
+    setDestLoading(true);
+    getUniqueDestinations()
+      .then(setDestSuggestions)
+      .catch(() => { /* silently fall back to empty list */ })
+      .finally(() => setDestLoading(false));
+  }, []);
+
   /** Increment or decrement the in-progress upload counter */
   const handleUploadingChange = useCallback((uploading: boolean) => {
     setUploadingCount((c) => Math.max(0, c + (uploading ? 1 : -1)));
@@ -59,6 +81,18 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
 
   const set = <K extends keyof PackageFormData>(key: K, value: PackageFormData[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
+
+  /* ── Duration change handler — trims itinerary when lowered ──────── */
+  const handleDurationChange = (newDuration: number) => {
+    set("duration_days", newDuration);
+    // Trim itinerary days if they exceed the new duration
+    setForm((f) => {
+      if (f.itinerary.length > newDuration) {
+        return { ...f, duration_days: newDuration, itinerary: f.itinerary.slice(0, newDuration).map((d, i) => ({ ...d, day: i + 1 })) };
+      }
+      return { ...f, duration_days: newDuration };
+    });
+  };
 
   // Dynamic array helpers
   const addToArray = (key: "destinations" | "included" | "notIncluded" | "gallery") =>
@@ -71,8 +105,12 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
     set(key, form[key].map((v, i) => (i === idx ? val : v)));
 
   // Itinerary helpers
-  const addDay = () =>
+  const canAddDay = form.itinerary.length < form.duration_days;
+
+  const addDay = () => {
+    if (!canAddDay) return;
     set("itinerary", [...form.itinerary, { day: form.itinerary.length + 1, title: "", details: [""] }]);
+  };
 
   const removeDay = (idx: number) =>
     set("itinerary", form.itinerary.filter((_, i) => i !== idx).map((d, i) => ({ ...d, day: i + 1 })));
@@ -104,10 +142,15 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
     if (form.price_lahore <= 0) { setError("Lahore price must be greater than 0"); return; }
     if (form.price_islamabad <= 0) { setError("Islamabad price must be greater than 0"); return; }
 
+    // Auto-generate slug from title
+    const slug = form.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+
     // Clean arrays (remove empty strings)
     const cleaned: PackageFormData = {
       ...form,
-      slug: form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      slug,
+      rating: form.rating ?? 5,
+      reviews_count: form.reviews_count ?? 0,
       destinations: form.destinations.filter((d) => d.trim()),
       included: form.included.filter((i) => i.trim()),
       notIncluded: form.notIncluded.filter((n) => n.trim()),
@@ -128,7 +171,16 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
   };
 
   const inputCls = "w-full rounded-xl border border-input bg-background px-4 py-2.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring";
+  const selectCls = "w-full appearance-none rounded-xl border border-input bg-background px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring cursor-pointer";
   const labelCls = "mb-1.5 block text-sm font-semibold text-foreground";
+
+  /** Wrapper that adds a custom chevron to native <select> */
+  const SelectWrap = ({ children }: { children: React.ReactNode }) => (
+    <div className="relative">
+      {children}
+      <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-8">
@@ -138,50 +190,63 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
         </div>
       )}
 
-      {/* Basic Info */}
+      {/* ── Basic Info ──────────────────────────────────────────────── */}
       <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
         <legend className="px-2 font-heading text-base font-bold text-foreground">Basic Information</legend>
         <div className="mt-2 grid gap-4 sm:grid-cols-2">
+          {/* Title — full width */}
           <div className="sm:col-span-2">
             <label className={labelCls}>Package Title *</label>
             <input value={form.title} onChange={(e) => set("title", e.target.value)} className={inputCls} placeholder="e.g. 5-Day Complete Kashmir Exploration" />
           </div>
-          <div className="sm:col-span-2">
-            <label className={labelCls}>URL Slug</label>
-            <input value={form.slug} onChange={(e) => set("slug", e.target.value)} className={inputCls} placeholder="auto-generated from title" />
-          </div>
+
+          {/* Short description — full width */}
           <div className="sm:col-span-2">
             <label className={labelCls}>Short Description *</label>
             <input value={form.short_description} onChange={(e) => set("short_description", e.target.value)} className={inputCls} placeholder="Brief one-liner" />
           </div>
+
+          {/* Full description — full width */}
           <div className="sm:col-span-2">
             <label className={labelCls}>Full Description</label>
             <textarea value={form.full_description} onChange={(e) => set("full_description", e.target.value)} rows={3} className={inputCls} placeholder="Detailed description" />
           </div>
+
+          {/* Duration — select */}
           <div>
             <label className={labelCls}>Duration (Days) *</label>
-            <input type="number" min={1} max={30} value={form.duration_days} onChange={(e) => set("duration_days", Number(e.target.value))} className={inputCls} />
+            <SelectWrap>
+              <select value={form.duration_days} onChange={(e) => handleDurationChange(Number(e.target.value))} className={selectCls}>
+                {DURATION_OPTIONS.map((d) => (
+                  <option key={d} value={d}>{d} Days</option>
+                ))}
+              </select>
+            </SelectWrap>
           </div>
+
+          {/* Package Type — select */}
           <div>
-            <label className={labelCls}>Package Type</label>
-            <input value={form.package_type} onChange={(e) => set("package_type", e.target.value)} className={inputCls} placeholder="Family,Couples,Budget" />
+            <label className={labelCls}>Package Type *</label>
+            <SelectWrap>
+              <select value={form.package_type} onChange={(e) => set("package_type", e.target.value)} className={selectCls}>
+                {PACKAGE_TYPE_OPTIONS.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </SelectWrap>
           </div>
+
+          {/* Prices — side by side */}
           <div>
             <label className={labelCls}>Price — Lahore (PKR) *</label>
-            <input type="number" min={0} value={form.price_lahore} onChange={(e) => set("price_lahore", Number(e.target.value))} className={inputCls} />
+            <input type="number" min={0} value={form.price_lahore} onChange={(e) => set("price_lahore", e.target.value === "" ? 0 : Number(e.target.value))} onFocus={(e) => e.target.select()} className={inputCls} />
           </div>
           <div>
             <label className={labelCls}>Price — Islamabad (PKR) *</label>
-            <input type="number" min={0} value={form.price_islamabad} onChange={(e) => set("price_islamabad", Number(e.target.value))} className={inputCls} />
+            <input type="number" min={0} value={form.price_islamabad} onChange={(e) => set("price_islamabad", e.target.value === "" ? 0 : Number(e.target.value))} onFocus={(e) => e.target.select()} className={inputCls} />
           </div>
-          <div>
-            <label className={labelCls}>Rating</label>
-            <input type="number" min={0} max={5} step={0.1} value={form.rating} onChange={(e) => set("rating", Number(e.target.value))} className={inputCls} />
-          </div>
-          <div>
-            <label className={labelCls}>Reviews Count</label>
-            <input type="number" min={0} value={form.reviews_count} onChange={(e) => set("reviews_count", Number(e.target.value))} className={inputCls} />
-          </div>
+
+          {/* Thumbnail — full width */}
           <div className="sm:col-span-2">
             <ImageUploader
               label="Package Thumbnail Image"
@@ -193,35 +258,60 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
         </div>
       </fieldset>
 
-      {/* Departure & Logistics */}
+      {/* ── Departure & Logistics ──────────────────────────────────── */}
       <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
         <legend className="px-2 font-heading text-base font-bold text-foreground">Departure & Logistics</legend>
-        <div className="mt-2 grid gap-4 sm:grid-cols-2">
+        <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Departure City — select */}
           <div>
-            <label className={labelCls}>Departure City</label>
-            <input value={form.departure_city} onChange={(e) => set("departure_city", e.target.value)} className={inputCls} />
+            <label className={labelCls}>Departure City *</label>
+            <SelectWrap>
+              <select value={form.departure_city} onChange={(e) => set("departure_city", e.target.value)} className={selectCls}>
+                {DEPARTURE_CITY_OPTIONS.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </SelectWrap>
           </div>
+
+          {/* Departure Day — select */}
           <div>
-            <label className={labelCls}>Departure Day</label>
-            <input value={form.departure_day} onChange={(e) => set("departure_day", e.target.value)} className={inputCls} placeholder="e.g. Friday" />
+            <label className={labelCls}>Departure Day *</label>
+            <SelectWrap>
+              <select value={form.departure_day} onChange={(e) => set("departure_day", e.target.value)} className={selectCls}>
+                {DEPARTURE_DAY_OPTIONS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </SelectWrap>
           </div>
+
+          {/* Next Departure */}
           <div>
             <label className={labelCls}>Next Departure</label>
             <input value={form.next_departure} onChange={(e) => set("next_departure", e.target.value)} className={inputCls} placeholder="e.g. Fri, 28 Aug 2026" />
           </div>
+
+          {/* Transport */}
           <div>
             <label className={labelCls}>Transport</label>
-            <input value={form.transport} onChange={(e) => set("transport", e.target.value)} className={inputCls} />
+            <input value={form.transport} onChange={(e) => set("transport", e.target.value)} className={inputCls} placeholder="e.g. AC Bus / Coaster" />
           </div>
+
+          {/* Accommodation */}
           <div>
             <label className={labelCls}>Accommodation</label>
-            <input value={form.accommodation} onChange={(e) => set("accommodation", e.target.value)} className={inputCls} />
+            <input value={form.accommodation} onChange={(e) => set("accommodation", e.target.value)} className={inputCls} placeholder="e.g. 3-Star Hotel" />
           </div>
+
+          {/* Meals */}
           <div>
             <label className={labelCls}>Meals</label>
-            <input value={form.meals} onChange={(e) => set("meals", e.target.value)} className={inputCls} />
+            <input value={form.meals} onChange={(e) => set("meals", e.target.value)} className={inputCls} placeholder="e.g. Breakfast + Dinner" />
           </div>
-          <div className="flex items-center gap-6">
+
+          {/* Checkboxes */}
+          <div className="flex items-end gap-6 sm:col-span-2 lg:col-span-3">
             <label className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} className="h-4 w-4 rounded accent-primary" />
               Featured
@@ -234,30 +324,30 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
         </div>
       </fieldset>
 
-      {/* Destinations */}
+      {/* ── Destinations (Creatable Dropdown) ────────────────────── */}
       <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
         <legend className="px-2 font-heading text-base font-bold text-foreground">Destinations</legend>
-        <div className="mt-2 grid gap-2">
-          {form.destinations.map((d, i) => (
-            <div key={i} className="flex gap-2">
-              <input value={d} onChange={(e) => updateArray("destinations", i, e.target.value)} className={inputCls} placeholder="e.g. Muzaffarabad" />
-              {form.destinations.length > 1 && (
-                <button type="button" onClick={() => removeFromArray("destinations", i)} className="shrink-0 rounded-xl p-2.5 text-destructive hover:bg-destructive/10">
-                  <Trash2 size={16} />
-                </button>
-              )}
-            </div>
-          ))}
-          <button type="button" onClick={() => addToArray("destinations")} className="mt-1 flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-            <Plus size={16} /> Add Destination
-          </button>
-        </div>
+        <p className="mb-3 mt-1 text-xs text-muted-foreground">
+          Select from previously used destinations or type to add a new one.
+        </p>
+        <CreatableSelect
+          suggestions={destSuggestions}
+          value={form.destinations.filter(Boolean)}
+          onChange={(next) => set("destinations", next)}
+          loading={destLoading}
+        />
       </fieldset>
 
-      {/* Itinerary */}
+      {/* ── Day-by-Day Itinerary (capped by duration) ──────────────── */}
       <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
         <legend className="px-2 font-heading text-base font-bold text-foreground">Day-by-Day Itinerary</legend>
-        <div className="mt-2 grid gap-5">
+        <p className="mb-3 text-xs text-muted-foreground">
+          You can add up to <strong>{form.duration_days}</strong> days based on the selected duration.
+          {form.itinerary.length >= form.duration_days && (
+            <span className="ml-1 font-semibold text-amber-500">— Limit reached</span>
+          )}
+        </p>
+        <div className="grid gap-5">
           {form.itinerary.map((day, di) => (
             <div key={di} className="rounded-2xl border border-border bg-background p-4">
               <div className="mb-3 flex items-center justify-between">
@@ -292,13 +382,20 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
               </div>
             </div>
           ))}
-          <button type="button" onClick={addDay} className="mt-1 flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
+
+          {/* Add Day — disabled when at the limit */}
+          <button
+            type="button"
+            onClick={addDay}
+            disabled={!canAddDay}
+            className="mt-1 flex items-center gap-2 text-sm font-semibold text-primary hover:underline disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+          >
             <Plus size={16} /> Add Day
           </button>
         </div>
       </fieldset>
 
-      {/* Inclusions & Exclusions */}
+      {/* ── Inclusions & Optional Add-ons ──────────────────────────── */}
       <div className="grid gap-8 lg:grid-cols-2">
         <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
           <legend className="px-2 font-heading text-base font-bold text-foreground">What's Included</legend>
@@ -320,11 +417,11 @@ export function PackageForm({ initial, onSubmit, submitLabel = "Save Package" }:
         </fieldset>
 
         <fieldset className="rounded-3xl border border-border bg-card p-6 shadow-soft">
-          <legend className="px-2 font-heading text-base font-bold text-foreground">What's Not Included</legend>
+          <legend className="px-2 font-heading text-base font-bold text-foreground">Optional Add-ons (Available for Extra Charges)</legend>
           <div className="mt-2 grid gap-2">
             {form.notIncluded.map((item, i) => (
               <div key={i} className="flex gap-2">
-                <input value={item} onChange={(e) => updateArray("notIncluded", i, e.target.value)} className={inputCls} placeholder="Excluded item" />
+                <input value={item} onChange={(e) => updateArray("notIncluded", i, e.target.value)} className={inputCls} placeholder="Add-on service" />
                 {form.notIncluded.length > 1 && (
                   <button type="button" onClick={() => removeFromArray("notIncluded", i)} className="shrink-0 rounded-xl p-2.5 text-destructive hover:bg-destructive/10">
                     <Trash2 size={16} />

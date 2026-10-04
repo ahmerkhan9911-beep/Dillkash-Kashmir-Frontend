@@ -6,10 +6,12 @@ import { api } from "./api";
 export interface BookingPayload {
   fullName: string;
   phoneNumber: string;
-  selectedTour?: string;
-  travelDate?: string;
-  persons?: number;
-  room?: string;
+  selectedTour?: string | undefined;
+  travelDate?: string | undefined;
+  persons?: number | undefined;
+  room?: string | undefined;
+  /** Optional promo code — the server re-validates it and recalculates the price. */
+  promoCode?: string | undefined;
 }
 
 export interface Booking {
@@ -23,12 +25,29 @@ export interface Booking {
   persons: number;
   room_type: string;
   status: "Pending" | "Confirmed" | "Cancelled";
+  total_price: number | null;
+  applied_promo: string | null;
+  discount_amount: number | null;
   created_at: string;
 }
 
+/** Server-computed pricing returned with a new booking. */
+export interface BookingPricing {
+  originalPrice: number | null;
+  discountAmount: number;
+  totalPrice: number | null;
+  appliedPromo: string | null;
+}
+
+export interface SubmitBookingResponse {
+  message: string;
+  booking: Booking;
+  pricing: BookingPricing;
+}
+
 /** Submit a new booking (authenticated) */
-export async function submitBooking(payload: BookingPayload): Promise<{ message: string; booking: Booking }> {
-  return api<{ message: string; booking: Booking }>("/bookings", {
+export async function submitBooking(payload: BookingPayload): Promise<SubmitBookingResponse> {
+  return api<SubmitBookingResponse>("/bookings", {
     method: "POST",
     body: payload,
   });

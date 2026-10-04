@@ -10,6 +10,7 @@ import {
   UserCheck,
   FileText,
   CalendarCheck,
+  TicketPercent,
 } from "lucide-react";
 import logoHorizontal from "@/assets/dillkash-logo-horizontal.png";
 import logoIcon from "@/assets/dillkash-logo-icon.png";
@@ -29,6 +30,7 @@ const NAV_LINKS = [
   { to: "/admin/blogs", label: "Blogs & Updates", icon: FileText, exact: false, badge: false, badgeCount: 0 },
   { to: "/admin/bookings", label: "Bookings", icon: CalendarCheck, exact: false, badge: true, badgeType: "pendingBookings" },
   { to: "/admin/custom-tours", label: "Custom Requests", icon: MapPin, exact: false, badge: true, badgeType: "pendingCustomTours" },
+  { to: "/admin/promo-codes", label: "Promo Codes", icon: TicketPercent, exact: false, badge: false },
 ] as const;
 
 export function AdminSidebar() {
@@ -93,7 +95,12 @@ export function AdminSidebar() {
             ? currentPath === l.to
             : currentPath.startsWith(l.to);
 
-          const badgeCount = l.badgeType === "pendingBookings" ? pendingBookings : l.badgeType === "pendingCustomTours" ? pendingCustomTours : 0;
+          const badgeCount =
+            "badgeType" in l && l.badgeType === "pendingBookings"
+              ? pendingBookings
+              : "badgeType" in l && l.badgeType === "pendingCustomTours"
+                ? pendingCustomTours
+                : 0;
           const showBadge = l.badge && badgeCount > 0;
 
           return (

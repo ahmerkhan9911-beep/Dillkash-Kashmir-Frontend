@@ -1,18 +1,22 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BedDouble,
   Bus,
   Calendar,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   HandPlatter,
   MapPin,
   Phone,
+  Plus,
   Users,
-  X,
   Loader2,
+  X,
+  ZoomIn,
 } from "lucide-react";
 import { formatPKR, getPickupPointsForCity, site, tours as staticTours, whatsappLink, type Tour } from "@/data/site";
 import { getPackageBySlug } from "@/services/packages";
@@ -125,6 +129,7 @@ function TourDetailPage() {
   const [tour, setTour] = useState<Tour | null>(loaderData.tour);
   const [loading, setLoading] = useState(!loaderData.tour);
   const [modalOpen, setModalOpen] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
   const { user } = useAuth();
   const city = user?.city === "Islamabad" ? "Islamabad" : "Lahore";
   const points = getPickupPointsForCity(city);
@@ -265,12 +270,13 @@ function TourDetailPage() {
           </Reveal>
           <Reveal delay={100}>
             <div className="h-full rounded-3xl border border-border bg-card p-6 shadow-soft">
-              <h2 className="font-heading text-xl font-extrabold text-foreground">What's Not Included</h2>
+              <h2 className="font-heading text-xl font-extrabold text-foreground">Optional Add-ons</h2>
+              <p className="mt-1 text-xs text-muted-foreground">Available for extra charges</p>
               <ul className="mt-4 space-y-3">
                 {tour.notIncluded.map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-muted-foreground">
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-destructive/10 text-destructive">
-                      <X size={13} />
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                      <Plus size={13} />
                     </span>
                     {item}
                   </li>
@@ -306,15 +312,26 @@ function TourDetailPage() {
           <h2 className="font-heading text-2xl font-extrabold text-foreground sm:text-3xl">Gallery</h2>
           <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
             {tour.gallery.map((img, i) => (
-              <div key={i} className="img-zoom aspect-[4/3] overflow-hidden rounded-2xl shadow-soft">
+              <div
+                key={i}
+                onClick={() => setLightboxIdx(i)}
+                className="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl shadow-soft ring-1 ring-transparent transition-all duration-300 hover:-translate-y-1 hover:shadow-hover hover:ring-primary/40"
+              >
                 <img
                   src={img}
                   alt={`${tour.title} — photo ${i + 1}`}
                   width={1280}
                   height={720}
                   loading="lazy"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
+                {/* Dark overlay + zoom icon on hover */}
+                <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/25" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white shadow-md backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
+                    <ZoomIn size={18} />
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -354,6 +371,106 @@ function TourDetailPage() {
       </div>
 
       <BookingModal open={modalOpen} onClose={() => setModalOpen(false)} preselectedTour={tour} />
+
+      {/* ── Gallery Lightbox ── */}
+      {lightboxIdx !== null && (
+        <GalleryLightbox
+          images={tour.gallery}
+          currentIdx={lightboxIdx}
+          title={tour.title}
+          onClose={() => setLightboxIdx(null)}
+          onPrev={() => setLightboxIdx((prev) => (prev! - 1 + tour.gallery.length) % tour.gallery.length)}
+          onNext={() => setLightboxIdx((prev) => (prev! + 1) % tour.gallery.length)}
+        />
+      )}
     </>
+  );
+}
+
+/* ── Gallery Lightbox ─────────────────────────────────────────── */
+interface GalleryLightboxProps {
+  images: string[];
+  currentIdx: number;
+  title: string;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+}
+
+function GalleryLightbox({ images, currentIdx, title, onClose, onPrev, onNext }: GalleryLightboxProps) {
+  // Keyboard navigation
+  const handleKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") onPrev();
+      else if (e.key === "ArrowRight") onNext();
+    },
+    [onClose, onPrev, onNext],
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.body.style.overflow = "";
+    };
+  }, [handleKey]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${title} gallery — image ${currentIdx + 1} of ${images.length}`}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      {/* Close button */}
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition-all hover:bg-white/20 hover:scale-110"
+        aria-label="Close gallery"
+      >
+        <X size={20} />
+      </button>
+
+      {/* Counter */}
+      <span className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold text-white backdrop-blur-sm">
+        {currentIdx + 1} / {images.length}
+      </span>
+
+      {/* Previous button */}
+      {images.length > 1 && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onPrev(); }}
+          className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-all hover:bg-white/20 hover:scale-110 sm:left-6"
+          aria-label="Previous image"
+        >
+          <ChevronLeft size={22} />
+        </button>
+      )}
+
+      {/* Next button */}
+      {images.length > 1 && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onNext(); }}
+          className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition-all hover:bg-white/20 hover:scale-110 sm:right-6"
+          aria-label="Next image"
+        >
+          <ChevronRight size={22} />
+        </button>
+      )}
+
+      {/* Main image */}
+      <img
+        src={images[currentIdx]}
+        alt={`${title} — photo ${currentIdx + 1}`}
+        className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
   );
 }

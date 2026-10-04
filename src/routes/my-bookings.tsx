@@ -7,6 +7,7 @@ import { getMyCustomTours, type CustomTourRequest } from "@/services/custom-tour
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { cn } from "@/lib/utils";
+import { formatPKR } from "@/data/site";
 
 export const Route = createFileRoute("/my-bookings")({
   beforeLoad: ({ context, location }) => {
@@ -73,12 +74,11 @@ function MyBookingsPage() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchData();
-      // Auto-refresh every 30 seconds
-      const interval = setInterval(fetchData, 30000);
-      return () => clearInterval(interval);
-    }
+    if (!isAuthenticated) return;
+    fetchData();
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, [isAuthenticated]);
 
   if (!isAuthenticated) {
@@ -177,6 +177,17 @@ function MyBookingsPage() {
                             </div>
                           </div>
                           <div className="text-right sm:shrink-0">
+                            {b.total_price != null && (
+                              <p className="font-heading text-lg font-extrabold text-foreground">
+                                {formatPKR(b.total_price)}
+                              </p>
+                            )}
+                            {b.applied_promo && (
+                              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                Promo: {b.applied_promo}
+                                {b.discount_amount != null && <> (−{formatPKR(b.discount_amount)})</>}
+                              </p>
+                            )}
                             <p className="text-xs text-muted-foreground">Booked on {new Date(b.created_at).toLocaleDateString()}</p>
                           </div>
                         </div>

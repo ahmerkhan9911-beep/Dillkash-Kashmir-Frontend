@@ -391,7 +391,8 @@ function AdminGuides() {
                     min={1}
                     max={50}
                     value={form.experience}
-                    onChange={(e) => setForm({ ...form, experience: Number(e.target.value) })}
+                    onChange={(e) => setForm({ ...form, experience: e.target.value === "" ? 0 : Number(e.target.value) })}
+                    onFocus={(e) => e.target.select()}
                     className={inputCls(formErrors.experience)}
                   />
                   {formErrors.experience && (
