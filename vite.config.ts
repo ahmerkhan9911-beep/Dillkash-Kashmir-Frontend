@@ -9,6 +9,10 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   nitro: false,
   vite: {
+    build: {
+      outDir: "dist",
+      emptyOutDir: true,
+    },
     server: {
       proxy: {
         // During development, proxy /api/* to the local Express server.
@@ -31,11 +35,7 @@ export default defineConfig({
       },
     },
     prerender: {
-      enabled: true,
-      crawlLinks: true,
-      concurrency: 4,
-      retryCount: 2,
-      failOnError: false,
+      enabled: false,
     },
   },
 });
