@@ -33,6 +33,9 @@ export default defineConfig({
     prerender: {
       enabled: true,
       crawlLinks: true,
+      concurrency: 4,
+      retryCount: 2,
+      failOnError: false,
     },
   },
 });
