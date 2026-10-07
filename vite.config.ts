@@ -11,7 +11,7 @@ export default defineConfig({
   tanstackStart: {
     // Never crawl links, never auto-discover routes, don't fan out to os.cpus() workers,
     // and don't fail the build if a render fails (finalize-dist.js verifies index.html).
-    pages: [],
+    pages: [{ path: '/' }],
     prerender: {
       crawlLinks: false,
       autoStaticPathsDiscovery: false,
