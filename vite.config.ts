@@ -11,7 +11,7 @@ export default defineConfig({
   tanstackStart: {
     // Never crawl links, never auto-discover routes, don't fan out to os.cpus() workers,
     // and don't fail the build if a render fails (finalize-dist.js verifies index.html).
-    pages: [{ path: '/' }],
+    pages: [],
     prerender: {
       crawlLinks: false,
       autoStaticPathsDiscovery: false,
@@ -20,10 +20,8 @@ export default defineConfig({
       retryCount: 0,
     },
     // SPA mode: emit a single static HTML shell (dist/client/_shell.html).
-    // scripts/finalize-dist.js copies it to index.html.
     spa: {
-      enabled: true,
-      prerender: { crawlLinks: false, retryCount: 0 },
+      enabled: false, // We will manually generate index.html instead
     },
   },
   vite: {
