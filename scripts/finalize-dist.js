@@ -24,5 +24,17 @@ if (fs.existsSync(clientDir)) {
 
   // Remove the now-empty or redundant client subdirectory
   fs.rmSync(clientDir, { recursive: true, force: true });
-  console.log("✓ Fully static SPA export ready in dist/ (index.html at root)");
 }
+
+// SPA mode emits the app as _shell.html; use it as the root index.html.
+const indexPath = path.join(distDir, "index.html");
+const shellPath = path.join(distDir, "_shell.html");
+if (!fs.existsSync(indexPath) && fs.existsSync(shellPath)) {
+  fs.copyFileSync(shellPath, indexPath);
+}
+
+if (!fs.existsSync(indexPath)) {
+  console.error("✗ dist/index.html is missing — build output is not deployable.");
+  process.exit(1);
+}
+console.log("✓ Fully static SPA export ready in dist/ (index.html at root)");

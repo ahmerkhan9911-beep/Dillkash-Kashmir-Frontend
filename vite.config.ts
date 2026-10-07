@@ -8,6 +8,14 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
   nitro: false,
+  tanstackStart: {
+    // SPA mode: emit a single static HTML shell (dist/client/_shell.html).
+    // No link crawling; scripts/finalize-dist.js copies it to index.html.
+    spa: {
+      enabled: true,
+      prerender: { crawlLinks: false, retryCount: 0 },
+    },
+  },
   vite: {
     build: {
       outDir: "dist",
