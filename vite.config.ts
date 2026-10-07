@@ -9,8 +9,18 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   nitro: false,
   tanstackStart: {
+    // Never crawl links, never auto-discover routes, don't fan out to os.cpus() workers,
+    // and don't fail the build if a render fails (finalize-dist.js verifies index.html).
+    pages: [],
+    prerender: {
+      crawlLinks: false,
+      autoStaticPathsDiscovery: false,
+      concurrency: 1,
+      failOnError: false,
+      retryCount: 0,
+    },
     // SPA mode: emit a single static HTML shell (dist/client/_shell.html).
-    // No link crawling; scripts/finalize-dist.js copies it to index.html.
+    // scripts/finalize-dist.js copies it to index.html.
     spa: {
       enabled: true,
       prerender: { crawlLinks: false, retryCount: 0 },
