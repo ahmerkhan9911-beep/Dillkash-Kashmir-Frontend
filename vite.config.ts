@@ -25,18 +25,5 @@ export default defineConfig({
       },
     },
   },
-  tanstackStart: {
-    // Server entry used during build-time prerendering
-    server: { entry: "server" },
-    spa: {
-      enabled: true,
-      prerender: {
-        outputPath: "/index",
-      },
-    },
-    prerender: {
-      enabled: false,
-    },
-  },
 });
 
