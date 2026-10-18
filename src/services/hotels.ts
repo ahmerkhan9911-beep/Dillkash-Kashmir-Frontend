@@ -1,6 +1,6 @@
 import { api } from "./api";
 import { resolveImageUrl } from "@/lib/resolveImage";
-import type { Hotel, Room } from "@/data/hotels";
+import type { Hotel } from "@/data/hotels";
 
 /* ─── Helpers ─── */
 
@@ -13,20 +13,6 @@ function cleanImageUrl(url: string): string {
 }
 
 /* ─── Response types ─── */
-
-interface RoomFromAPI {
-  id: number;
-  hotel_id: number;
-  hotelId?: number;
-  room_type: string;
-  roomType?: string;
-  price_per_night: number;
-  pricePerNight?: number;
-  max_guests: number;
-  maxGuests?: number;
-  available_rooms: number;
-  availableRooms?: number;
-}
 
 interface HotelFromAPI {
   id: number;
@@ -42,28 +28,8 @@ interface HotelFromAPI {
   amenities: string[];
   featured: number | boolean;
   is_active: number | boolean;
-  check_in_time?: string;
-  checkInTime?: string;
-  check_out_time?: string;
-  checkOutTime?: string;
-  cancellation_policy?: string;
-  cancellationPolicy?: string;
-  house_rules?: string;
-  houseRules?: string;
-  rooms?: RoomFromAPI[];
   created_at?: string;
   updated_at?: string;
-}
-
-function toRoom(r: RoomFromAPI): Room {
-  return {
-    id: r.id,
-    hotelId: r.hotelId ?? r.hotel_id,
-    roomType: r.roomType ?? r.room_type ?? "Standard",
-    pricePerNight: Number(r.pricePerNight ?? r.price_per_night ?? 0),
-    maxGuests: r.maxGuests ?? r.max_guests ?? 2,
-    availableRooms: r.availableRooms ?? r.available_rooms ?? 1,
-  };
 }
 
 /** Normalize API response to the Hotel interface used by components. */
@@ -82,11 +48,6 @@ function toHotel(h: HotelFromAPI): Hotel {
     amenities: Array.isArray(h.amenities) ? h.amenities : [],
     featured: !!h.featured,
     is_active: !!h.is_active,
-    checkInTime: h.checkInTime ?? h.check_in_time ?? "2:00 PM",
-    checkOutTime: h.checkOutTime ?? h.check_out_time ?? "12:00 PM",
-    cancellationPolicy: h.cancellationPolicy ?? h.cancellation_policy ?? "",
-    houseRules: h.houseRules ?? h.house_rules ?? "",
-    rooms: Array.isArray(h.rooms) ? h.rooms.map(toRoom) : [],
   };
 }
 
@@ -126,7 +87,7 @@ export async function getHotelById(id: number): Promise<Hotel | null> {
   }
 }
 
-/** Create a new hotel. */
+/** Create a new hotel (lead generation model). */
 export async function createHotel(
   data: Omit<Hotel, "id" | "slug">
 ): Promise<Hotel> {
@@ -140,11 +101,6 @@ export async function createHotel(
     amenities: data.amenities,
     featured: data.featured,
     is_active: data.is_active,
-    checkInTime: data.checkInTime,
-    checkOutTime: data.checkOutTime,
-    cancellationPolicy: data.cancellationPolicy,
-    houseRules: data.houseRules,
-    rooms: data.rooms,
   };
   const res = await api<{ hotel: HotelFromAPI }>("/hotels", {
     method: "POST",
@@ -170,11 +126,6 @@ export async function updateHotel(
   if (data.amenities !== undefined) payload["amenities"] = data.amenities;
   if (data.featured !== undefined) payload["featured"] = data.featured;
   if (data.is_active !== undefined) payload["is_active"] = data.is_active;
-  if (data.checkInTime !== undefined) payload["checkInTime"] = data.checkInTime;
-  if (data.checkOutTime !== undefined) payload["checkOutTime"] = data.checkOutTime;
-  if (data.cancellationPolicy !== undefined) payload["cancellationPolicy"] = data.cancellationPolicy;
-  if (data.houseRules !== undefined) payload["houseRules"] = data.houseRules;
-  if (data.rooms !== undefined) payload["rooms"] = data.rooms;
 
   const res = await api<{ hotel: HotelFromAPI }>(`/hotels/${id}`, {
     method: "PUT",
@@ -196,7 +147,7 @@ export async function toggleHotelStatus(id: number): Promise<Hotel> {
   return toHotel(res.hotel);
 }
 
-/* ─── Hotel Booking API ─── */
+/* ─── Hotel Booking / Lead Generation API ─── */
 
 export interface HotelBooking {
   id: number;
@@ -209,8 +160,8 @@ export interface HotelBooking {
   check_out_date: string;
   guests_count: number;
   rooms_count: number;
-  room_type: string;
-  total_price: number;
+  room_type?: string;
+  total_price?: number;
   status: "Pending" | "Confirmed" | "Cancelled";
   created_at: string;
   hotel_name?: string;
@@ -220,14 +171,16 @@ export interface HotelBooking {
 
 export interface HotelBookingPayload {
   hotelId: number;
+  guestName: string;
+  guestPhone: string;
+  guestEmail?: string;
   checkInDate: string;
   checkOutDate: string;
   guestsCount?: number;
   roomsCount?: number;
-  roomType?: string;
 }
 
-/** Submit a hotel booking (authenticated users). */
+/** Submit a hotel room availability inquiry. */
 export async function submitHotelBooking(
   payload: HotelBookingPayload
 ): Promise<{ message: string; booking: HotelBooking }> {
@@ -240,7 +193,7 @@ export async function getMyHotelBookings(): Promise<HotelBooking[]> {
   return data.bookings;
 }
 
-/** Get all hotel bookings (admin). */
+/** Get all hotel booking inquiries (admin). */
 export async function getAllHotelBookings(
   status?: string
 ): Promise<HotelBooking[]> {
@@ -263,7 +216,7 @@ export async function updateHotelBookingStatus(
   return data.booking;
 }
 
-/** Delete a hotel booking (admin). */
+/** Delete a hotel booking inquiry (admin). */
 export async function deleteHotelBooking(id: number): Promise<void> {
   await api(`/hotel-bookings/${id}`, { method: "DELETE" });
 }

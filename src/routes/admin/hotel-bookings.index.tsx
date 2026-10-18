@@ -9,11 +9,11 @@ import {
   Clock,
   CalendarDays,
   Users,
-  BedDouble,
   Mail,
   Phone,
   Building,
   MapPin,
+  MessageCircle,
 } from "lucide-react";
 import {
   getAllHotelBookings,
@@ -22,7 +22,6 @@ import {
   type HotelBooking,
 } from "@/services/hotels";
 import { DeleteConfirmDialog } from "@/components/admin/DeleteConfirmDialog";
-import { formatPKR } from "@/data/site";
 
 export const Route = createFileRoute("/admin/hotel-bookings/")({
   component: AdminHotelBookings,
@@ -39,6 +38,14 @@ const STATUS_ICONS: Record<HotelBooking["status"], React.ReactNode> = {
   Confirmed: <CheckCircle2 size={12} />,
   Cancelled: <XCircle size={12} />,
 };
+
+function cleanPhoneForWhatsApp(phone: string): string {
+  let cleaned = phone.replace(/[^0-9]/g, "");
+  if (cleaned.startsWith("0")) {
+    cleaned = "92" + cleaned.slice(1);
+  }
+  return cleaned;
+}
 
 function AdminHotelBookings() {
   const [bookings, setBookings] = useState<HotelBooking[]>([]);
@@ -74,7 +81,7 @@ function AdminHotelBookings() {
       setBookings((prev) =>
         prev.map((b) => (b.id === booking.id ? { ...b, status } : b))
       );
-      flash(`Hotel Booking #${booking.id} marked as ${status}`);
+      flash(`Inquiry #${booking.id} marked as ${status}`);
     } catch (err) {
       flash(err instanceof Error ? err.message : "Update failed");
     } finally {
@@ -87,7 +94,7 @@ function AdminHotelBookings() {
     setDeleteLoading(true);
     try {
       await deleteHotelBooking(deleteTarget.id);
-      flash(`Hotel Booking #${deleteTarget.id} deleted`);
+      flash(`Inquiry #${deleteTarget.id} deleted`);
       setDeleteTarget(null);
       load();
     } catch (err) {
@@ -116,10 +123,10 @@ function AdminHotelBookings() {
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl font-extrabold text-foreground sm:text-3xl">
-            Hotel Reservations
+            Hotel Inquiries & Leads
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Review and manage guest bookings for hotels and resorts.
+            Review room availability requests and follow up with guests and hotels directly via WhatsApp/Call.
           </p>
         </div>
       </div>
@@ -134,7 +141,7 @@ function AdminHotelBookings() {
       {/* Filter tabs */}
       <div className="mb-6 flex flex-wrap gap-2">
         {[
-          { label: "All Reservations", value: "", count: bookings.length },
+          { label: "All Leads", value: "", count: bookings.length },
           { label: "Pending", value: "Pending", count: pendingCount },
           { label: "Confirmed", value: "Confirmed", count: confirmedCount },
           { label: "Cancelled", value: "Cancelled", count: cancelledCount },
@@ -171,11 +178,11 @@ function AdminHotelBookings() {
       ) : bookings.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
           <Building size={40} className="mx-auto mb-3 opacity-40" />
-          <p className="text-base font-semibold">No hotel reservations found</p>
+          <p className="text-base font-semibold">No hotel inquiries found</p>
           <p className="mt-1 text-xs">
             {filterStatus
-              ? `No bookings match the "${filterStatus}" status filter.`
-              : "No guest has reserved a hotel yet."}
+              ? `No inquiries match the "${filterStatus}" status filter.`
+              : "No guest has submitted a room availability inquiry yet."}
           </p>
         </div>
       ) : (
@@ -185,136 +192,165 @@ function AdminHotelBookings() {
               <thead className="border-b border-border bg-muted/40 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-5 py-3.5">Guest & Contact</th>
-                  <th className="px-5 py-3.5">Hotel & Room</th>
-                  <th className="px-5 py-3.5">Dates & Stay</th>
-                  <th className="px-5 py-3.5">Total Price</th>
+                  <th className="px-5 py-3.5">Requested Hotel</th>
+                  <th className="px-5 py-3.5">Expected Dates</th>
+                  <th className="px-5 py-3.5">Guests</th>
                   <th className="px-5 py-3.5">Status</th>
-                  <th className="px-5 py-3.5 text-right">Actions</th>
+                  <th className="px-5 py-3.5 text-right">Follow Up / Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {bookings.map((booking) => (
-                  <tr key={booking.id} className="transition-colors hover:bg-muted/20">
-                    {/* Guest details */}
-                    <td className="px-5 py-4">
-                      <div className="font-semibold text-foreground">{booking.guest_name}</div>
-                      <div className="mt-1 flex flex-col gap-0.5 text-xs text-muted-foreground">
-                        <a
-                          href={`tel:${booking.guest_phone}`}
-                          className="inline-flex items-center gap-1 hover:text-foreground"
-                        >
-                          <Phone size={12} className="shrink-0 text-primary" />
-                          {booking.guest_phone}
-                        </a>
-                        {booking.guest_email && (
-                          <a
-                            href={`mailto:${booking.guest_email}`}
-                            className="inline-flex items-center gap-1 hover:text-foreground"
-                          >
-                            <Mail size={12} className="shrink-0 text-primary" />
-                            {booking.guest_email}
-                          </a>
-                        )}
-                      </div>
-                    </td>
+                {bookings.map((booking) => {
+                  const waNumber = cleanPhoneForWhatsApp(booking.guest_phone);
+                  const waText = encodeURIComponent(
+                    `Hi ${booking.guest_name}, this is DillKash Kashmir regarding your room availability request for ${booking.hotel_name || "Hotel"}.`
+                  );
+                  const waUrl = waNumber ? `https://wa.me/${waNumber}?text=${waText}` : "";
 
-                    {/* Hotel & Room */}
-                    <td className="px-5 py-4">
-                      <div className="font-semibold text-foreground flex items-center gap-1.5">
-                        <Building size={14} className="text-primary shrink-0" />
-                        {booking.hotel_name || `Hotel #${booking.hotel_id}`}
-                      </div>
-                      {booking.hotel_location && (
-                        <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin size={11} className="shrink-0 text-muted-foreground" />
-                          {booking.hotel_location}
+                  return (
+                    <tr key={booking.id} className="transition-colors hover:bg-muted/20">
+                      {/* Guest details */}
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-foreground">{booking.guest_name}</div>
+                        <div className="mt-1 flex flex-col gap-1 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={`tel:${booking.guest_phone}`}
+                              className="inline-flex items-center gap-1 hover:text-foreground font-medium"
+                            >
+                              <Phone size={12} className="shrink-0 text-primary" />
+                              {booking.guest_phone}
+                            </a>
+                            {waUrl && (
+                              <a
+                                href={waUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 hover:bg-emerald-500/20"
+                                title="Open WhatsApp Chat"
+                              >
+                                <MessageCircle size={10} /> WhatsApp
+                              </a>
+                            )}
+                          </div>
+                          {booking.guest_email && (
+                            <a
+                              href={`mailto:${booking.guest_email}`}
+                              className="inline-flex items-center gap-1 hover:text-foreground"
+                            >
+                              <Mail size={12} className="shrink-0 text-primary" />
+                              {booking.guest_email}
+                            </a>
+                          )}
                         </div>
-                      )}
-                      <div className="mt-1 inline-flex items-center gap-1 rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground">
-                        <BedDouble size={12} />
-                        {booking.room_type} ({booking.rooms_count} {booking.rooms_count === 1 ? "room" : "rooms"})
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Dates & Guests */}
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-1.5 font-medium text-foreground text-xs">
-                        <CalendarDays size={14} className="shrink-0 text-primary" />
-                        {formatDate(booking.check_in_date)} → {formatDate(booking.check_out_date)}
-                      </div>
-                      <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                        <Users size={12} />
-                        {booking.guests_count} Guest{booking.guests_count > 1 ? "s" : ""}
-                      </div>
-                    </td>
-
-                    {/* Total Price */}
-                    <td className="px-5 py-4">
-                      <span className="font-heading font-extrabold text-foreground">
-                        {formatPKR(booking.total_price)}
-                      </span>
-                    </td>
-
-                    {/* Status */}
-                    <td className="px-5 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
-                          STATUS_STYLES[booking.status]
-                        }`}
-                      >
-                        {STATUS_ICONS[booking.status]}
-                        {booking.status}
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-4 text-right">
-                      <div className="inline-flex items-center gap-1">
-                        {booking.status !== "Confirmed" && (
-                          <button
-                            type="button"
-                            disabled={updatingId === booking.id}
-                            onClick={() => handleStatusChange(booking, "Confirmed")}
-                            className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-500/10 hover:text-emerald-700 disabled:opacity-40"
-                            title="Confirm Booking"
-                          >
-                            <CheckCircle2 size={16} />
-                          </button>
+                      {/* Hotel */}
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-foreground flex items-center gap-1.5">
+                          <Building size={14} className="text-primary shrink-0" />
+                          {booking.hotel_name || `Hotel #${booking.hotel_id}`}
+                        </div>
+                        {booking.hotel_location && (
+                          <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                            <MapPin size={11} className="shrink-0 text-muted-foreground" />
+                            {booking.hotel_location}
+                          </div>
                         )}
-                        {booking.status !== "Cancelled" && (
-                          <button
-                            type="button"
-                            disabled={updatingId === booking.id}
-                            onClick={() => handleStatusChange(booking, "Cancelled")}
-                            className="rounded-lg p-1.5 text-amber-600 transition-colors hover:bg-amber-500/10 hover:text-amber-700 disabled:opacity-40"
-                            title="Cancel Booking"
-                          >
-                            <XCircle size={16} />
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setDeleteTarget(booking)}
-                          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                          title="Delete Booking"
+                      </td>
+
+                      {/* Dates */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-1.5 font-medium text-foreground text-xs">
+                          <CalendarDays size={14} className="shrink-0 text-primary" />
+                          {formatDate(booking.check_in_date)} → {formatDate(booking.check_out_date)}
+                        </div>
+                        <div className="mt-1 text-[11px] text-muted-foreground">
+                          Requested on {new Date(booking.created_at).toLocaleDateString()}
+                        </div>
+                      </td>
+
+                      {/* Guests */}
+                      <td className="px-5 py-4">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-semibold text-foreground">
+                          <Users size={12} className="text-primary" />
+                          {booking.guests_count} Guest{booking.guests_count > 1 ? "s" : ""}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
+                            STATUS_STYLES[booking.status]
+                          }`}
                         >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {STATUS_ICONS[booking.status]}
+                          {booking.status}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-5 py-4 text-right">
+                        <div className="inline-flex items-center gap-1.5">
+                          {waUrl && (
+                            <a
+                              href={waUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-500/10 hover:text-emerald-700"
+                              title="Chat with Guest on WhatsApp"
+                            >
+                              <MessageCircle size={16} />
+                            </a>
+                          )}
+                          {booking.status !== "Confirmed" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === booking.id}
+                              onClick={() => handleStatusChange(booking, "Confirmed")}
+                              className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-500/10 hover:text-emerald-700 disabled:opacity-40"
+                              title="Mark as Confirmed"
+                            >
+                              <CheckCircle2 size={16} />
+                            </button>
+                          )}
+                          {booking.status !== "Cancelled" && (
+                            <button
+                              type="button"
+                              disabled={updatingId === booking.id}
+                              onClick={() => handleStatusChange(booking, "Cancelled")}
+                              className="rounded-lg p-1.5 text-amber-600 transition-colors hover:bg-amber-500/10 hover:text-amber-700 disabled:opacity-40"
+                              title="Mark as Cancelled"
+                            >
+                              <XCircle size={16} />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setDeleteTarget(booking)}
+                            className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                            title="Delete Lead"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </div>
       )}
 
-      {/* Delete confirmation */}
+      {/* Delete Dialog */}
       {deleteTarget && (
         <DeleteConfirmDialog
           open={!!deleteTarget}
-          title={`Reservation #${deleteTarget.id} for ${deleteTarget.guest_name}`}
+          title="Delete Hotel Inquiry"
+          description={`Are you sure you want to delete inquiry #${deleteTarget.id} from ${deleteTarget.guest_name}? This action cannot be undone.`}
           loading={deleteLoading}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

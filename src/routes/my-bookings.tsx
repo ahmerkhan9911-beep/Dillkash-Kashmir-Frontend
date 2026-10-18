@@ -265,10 +265,6 @@ function MyBookingsPage() {
                                 {formatDate(hb.check_in_date)} → {formatDate(hb.check_out_date)}
                               </span>
                               <span className="inline-flex items-center gap-1.5">
-                                <BedDouble size={16} />
-                                {hb.room_type} ({hb.rooms_count} {hb.rooms_count === 1 ? "room" : "rooms"})
-                              </span>
-                              <span className="inline-flex items-center gap-1.5">
                                 <Users size={16} />
                                 {hb.guests_count} Guests
                               </span>
@@ -276,11 +272,17 @@ function MyBookingsPage() {
                           </div>
 
                           <div className="text-right sm:shrink-0">
-                            <p className="font-heading text-lg font-extrabold text-foreground">
-                              {formatPKR(hb.total_price)}
-                            </p>
+                            {hb.total_price ? (
+                              <p className="font-heading text-lg font-extrabold text-foreground">
+                                {formatPKR(hb.total_price)}
+                              </p>
+                            ) : (
+                              <p className="text-xs font-semibold text-primary">
+                                Inquiry Submitted
+                              </p>
+                            )}
                             <p className="text-xs text-muted-foreground">
-                              Reserved on {new Date(hb.created_at).toLocaleDateString()}
+                              Requested on {new Date(hb.created_at).toLocaleDateString()}
                             </p>
                           </div>
                         </div>

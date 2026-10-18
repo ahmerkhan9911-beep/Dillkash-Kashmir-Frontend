@@ -646,16 +646,16 @@ function HotelCard({ hotel }: { hotel: Hotel }) {
           {hotel.description}
         </p>
 
-        {/* Room type chips */}
-        {hotel.rooms && hotel.rooms.length > 0 && (
+        {/* Top Amenities chips */}
+        {hotel.amenities && hotel.amenities.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {hotel.rooms.slice(0, 3).map((room) => (
+            {hotel.amenities.slice(0, 3).map((amenity) => (
               <span
-                key={room.id ?? room.roomType}
-                className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-secondary-foreground"
+                key={amenity}
+                className="inline-flex items-center gap-1 rounded-full bg-secondary/80 px-2.5 py-0.5 text-[11px] font-semibold text-secondary-foreground"
               >
-                <BedDouble size={10} />
-                {room.roomType}
+                <Sparkles size={10} className="text-primary" />
+                {amenity}
               </span>
             ))}
           </div>
