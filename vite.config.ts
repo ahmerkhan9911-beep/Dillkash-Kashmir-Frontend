@@ -8,10 +8,7 @@ export default defineConfig({
   nitro: false,
   tanstackStart: {
     prerender: {
-      enabled: true,
-      routes: ['/'],
-      crawlLinks: true,
-      concurrency: 1
+      enabled: false,
     }
   },
   vite: {
