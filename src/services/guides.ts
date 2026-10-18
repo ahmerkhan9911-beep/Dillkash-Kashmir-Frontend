@@ -96,12 +96,12 @@ export async function updateGuide(
   data: Partial<Guide>
 ): Promise<Guide> {
   const payload: Record<string, unknown> = {};
-  if (data.name !== undefined) payload.name = data.name;
-  if (data.role !== undefined) payload.role = data.role;
-  if (data.experience !== undefined) payload.experience = data.experience;
-  if (data.bio !== undefined) payload.bio = data.bio;
-  if (data.imageUrl !== undefined) payload.image_url = cleanImageUrl(data.imageUrl || "");
-  if (data.is_active !== undefined) payload.is_active = data.is_active;
+  if (data.name !== undefined) payload["name"] = data.name;
+  if (data.role !== undefined) payload["role"] = data.role;
+  if (data.experience !== undefined) payload["experience"] = data.experience;
+  if (data.bio !== undefined) payload["bio"] = data.bio;
+  if (data.imageUrl !== undefined) payload["image_url"] = cleanImageUrl(data.imageUrl || "");
+  if (data.is_active !== undefined) payload["is_active"] = data.is_active;
 
   const res = await api<{ guide: GuideFromAPI }>(`/guides/${id}`, {
     method: "PUT",

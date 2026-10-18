@@ -17,9 +17,9 @@ export const Route = createFileRoute("/blogs/")({
 });
 
 function BlogsPage() {
-  const { data: blogs, isLoading } = useQuery({
+  const { data: blogs, isLoading } = useQuery<any[]>({
     queryKey: ["public-blogs"],
-    queryFn: () => api("/blogs"),
+    queryFn: () => api<any[]>("/blogs"),
   });
 
   return (
@@ -57,7 +57,8 @@ function BlogsPage() {
             {blogs.map((blog: any, i: number) => (
               <Reveal key={blog.id} delay={(i % 3) * 70}>
                 <Link
-                  to={`/blogs/${blog.slug}`}
+                  to="/blogs/$slug"
+                  params={{ slug: blog.slug }}
                   className="group block h-full overflow-hidden rounded-3xl border border-border bg-card shadow-soft transition-all hover:-translate-y-1 hover:shadow-hover"
                 >
                   <div className="relative aspect-video w-full overflow-hidden bg-muted">

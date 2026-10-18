@@ -6,9 +6,10 @@ import { Reveal } from "@/components/site/Reveal";
 import heroImg from "@/assets/hero-kashmir.jpg";
 
 export const Route = createFileRoute("/signup")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    redirect: search.redirect as string | undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
+    const r = search["redirect"];
+    return typeof r === "string" ? { redirect: r } : {};
+  },
   head: () => ({
     meta: [
       { title: "Create Account — DillKash Kashmir" },

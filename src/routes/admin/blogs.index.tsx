@@ -11,9 +11,9 @@ export const Route = createFileRoute("/admin/blogs/")({
 function AdminBlogsIndex() {
   const queryClient = useQueryClient();
 
-  const { data: blogs, isLoading } = useQuery({
+  const { data: blogs, isLoading } = useQuery<any[]>({
     queryKey: ["admin-blogs"],
-    queryFn: () => api("/blogs"),
+    queryFn: () => api<any[]>("/blogs"),
   });
 
   const deleteMutation = useMutation({
@@ -97,7 +97,8 @@ function AdminBlogsIndex() {
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link
-                          to={`/blogs/${blog.slug}`}
+                          to="/blogs/$slug"
+                          params={{ slug: blog.slug }}
                           className="rounded-lg p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"
                           title="View on site"
                         >

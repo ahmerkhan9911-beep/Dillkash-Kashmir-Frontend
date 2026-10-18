@@ -7,6 +7,15 @@
 
 /* ─────────────────────── Types ─────────────────────── */
 
+export interface Room {
+  id?: number;
+  hotelId?: number;
+  roomType: string;
+  pricePerNight: number;
+  maxGuests: number;
+  availableRooms: number;
+}
+
 export interface Hotel {
   id: number;
   slug: string;
@@ -19,6 +28,12 @@ export interface Hotel {
   amenities: string[];
   featured: boolean;
   is_active: boolean;
+  // Rich detail fields
+  checkInTime?: string | undefined;
+  checkOutTime?: string | undefined;
+  cancellationPolicy?: string | undefined;
+  houseRules?: string | undefined;
+  rooms?: Room[] | undefined;
 }
 
 /* ─────────────────────── Constants ─────────────────── */

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getAdminCustomTours, updateCustomTourStatus, CustomTourRequest, deleteCustomTour } from "@/services/custom-tours";
-import { MapPin, Calendar, Users, Hotel, Car, CheckCircle, XCircle, Trash2, Clock, Mail } from "lucide-react";
+import { MapPin, Calendar, Users, Hotel, Car, CheckCircle, XCircle, Trash2, Clock, Mail, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/custom-tours/")({
@@ -144,6 +144,14 @@ function AdminCustomTours() {
                     Total Persons: {req.persons}
                   </span>
                 </div>
+                {req.duration && (
+                  <div className="flex items-center gap-3">
+                    <Timer size={16} className="text-muted-foreground" />
+                    <span className="font-medium text-foreground">
+                      Duration: {req.duration}
+                    </span>
+                  </div>
+                )}
                 <div className="flex items-center gap-3">
                   <Hotel size={16} className="text-muted-foreground" />
                   <span className="font-medium text-foreground">

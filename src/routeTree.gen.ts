@@ -25,6 +25,8 @@ import { Route as AdminHotelsRouteImport } from './routes/admin/hotels'
 import { Route as AdminPackagesRouteImport } from './routes/admin/packages'
 import { Route as BlogsIndexRouteImport } from './routes/blogs.index'
 import { Route as BlogsSlugRouteImport } from './routes/blogs.$slug'
+import { Route as HotelsIndexRouteImport } from './routes/hotels.index'
+import { Route as HotelsSlugRouteImport } from './routes/hotels.$slug'
 import { Route as PackagesIndexRouteImport } from './routes/packages.index'
 import { Route as PackagesSlugRouteImport } from './routes/packages.$slug'
 import { Route as AdminBlogsIndexRouteImport } from './routes/admin/blogs.index'
@@ -34,6 +36,7 @@ import { Route as AdminCustomToursIndexRouteImport } from './routes/admin/custom
 import { Route as AdminDestinationsIndexRouteImport } from './routes/admin/destinations.index'
 import { Route as AdminDestinationsCreateRouteImport } from './routes/admin/destinations.create'
 import { Route as AdminGuidesIndexRouteImport } from './routes/admin/guides.index'
+import { Route as AdminHotelBookingsIndexRouteImport } from './routes/admin/hotel-bookings.index'
 import { Route as AdminHotelsIndexRouteImport } from './routes/admin/hotels.index'
 import { Route as AdminHotelsCreateRouteImport } from './routes/admin/hotels.create'
 import { Route as AdminPackagesIndexRouteImport } from './routes/admin/packages.index'
@@ -124,6 +127,16 @@ const BlogsSlugRoute = BlogsSlugRouteImport.update({
   path: '/blogs/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HotelsIndexRoute = HotelsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HotelsRoute,
+} as any)
+const HotelsSlugRoute = HotelsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => HotelsRoute,
+} as any)
 const PackagesIndexRoute = PackagesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -167,6 +180,11 @@ const AdminDestinationsCreateRoute = AdminDestinationsCreateRouteImport.update({
 const AdminGuidesIndexRoute = AdminGuidesIndexRouteImport.update({
   id: '/guides/',
   path: '/guides/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminHotelBookingsIndexRoute = AdminHotelBookingsIndexRouteImport.update({
+  id: '/hotel-bookings/',
+  path: '/hotel-bookings/',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminHotelsIndexRoute = AdminHotelsIndexRouteImport.update({
@@ -221,7 +239,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/custom-tour': typeof CustomTourRoute
-  '/hotels': typeof HotelsRoute
+  '/hotels': typeof HotelsRouteWithChildren
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
   '/packages': typeof PackagesRouteWithChildren
@@ -230,9 +248,11 @@ export interface FileRoutesByFullPath {
   '/admin/hotels': typeof AdminHotelsRouteWithChildren
   '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/blogs/$slug': typeof BlogsSlugRoute
+  '/hotels/$slug': typeof HotelsSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blogs/': typeof BlogsIndexRoute
+  '/hotels/': typeof HotelsIndexRoute
   '/packages/': typeof PackagesIndexRoute
   '/admin/blogs/create': typeof AdminBlogsCreateRoute
   '/admin/destinations/create': typeof AdminDestinationsCreateRoute
@@ -243,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/admin/custom-tours/': typeof AdminCustomToursIndexRoute
   '/admin/destinations/': typeof AdminDestinationsIndexRoute
   '/admin/guides/': typeof AdminGuidesIndexRoute
+  '/admin/hotel-bookings/': typeof AdminHotelBookingsIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
   '/admin/promo-codes/': typeof AdminPromoCodesIndexRoute
@@ -256,14 +277,15 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/custom-tour': typeof CustomTourRoute
-  '/hotels': typeof HotelsRoute
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
   '/signup': typeof SignupRoute
   '/blogs/$slug': typeof BlogsSlugRoute
+  '/hotels/$slug': typeof HotelsSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/blogs': typeof BlogsIndexRoute
+  '/hotels': typeof HotelsIndexRoute
   '/packages': typeof PackagesIndexRoute
   '/admin/blogs/create': typeof AdminBlogsCreateRoute
   '/admin/destinations/create': typeof AdminDestinationsCreateRoute
@@ -274,6 +296,7 @@ export interface FileRoutesByTo {
   '/admin/custom-tours': typeof AdminCustomToursIndexRoute
   '/admin/destinations': typeof AdminDestinationsIndexRoute
   '/admin/guides': typeof AdminGuidesIndexRoute
+  '/admin/hotel-bookings': typeof AdminHotelBookingsIndexRoute
   '/admin/hotels': typeof AdminHotelsIndexRoute
   '/admin/packages': typeof AdminPackagesIndexRoute
   '/admin/promo-codes': typeof AdminPromoCodesIndexRoute
@@ -289,7 +312,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/custom-tour': typeof CustomTourRoute
-  '/hotels': typeof HotelsRoute
+  '/hotels': typeof HotelsRouteWithChildren
   '/login': typeof LoginRoute
   '/my-bookings': typeof MyBookingsRoute
   '/packages': typeof PackagesRouteWithChildren
@@ -298,9 +321,11 @@ export interface FileRoutesById {
   '/admin/hotels': typeof AdminHotelsRouteWithChildren
   '/admin/packages': typeof AdminPackagesRouteWithChildren
   '/blogs/$slug': typeof BlogsSlugRoute
+  '/hotels/$slug': typeof HotelsSlugRoute
   '/packages/$slug': typeof PackagesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blogs/': typeof BlogsIndexRoute
+  '/hotels/': typeof HotelsIndexRoute
   '/packages/': typeof PackagesIndexRoute
   '/admin/blogs/create': typeof AdminBlogsCreateRoute
   '/admin/destinations/create': typeof AdminDestinationsCreateRoute
@@ -311,6 +336,7 @@ export interface FileRoutesById {
   '/admin/custom-tours/': typeof AdminCustomToursIndexRoute
   '/admin/destinations/': typeof AdminDestinationsIndexRoute
   '/admin/guides/': typeof AdminGuidesIndexRoute
+  '/admin/hotel-bookings/': typeof AdminHotelBookingsIndexRoute
   '/admin/hotels/': typeof AdminHotelsIndexRoute
   '/admin/packages/': typeof AdminPackagesIndexRoute
   '/admin/promo-codes/': typeof AdminPromoCodesIndexRoute
@@ -336,9 +362,11 @@ export interface FileRouteTypes {
     | '/admin/hotels'
     | '/admin/packages'
     | '/blogs/$slug'
+    | '/hotels/$slug'
     | '/packages/$slug'
     | '/admin/'
     | '/blogs/'
+    | '/hotels/'
     | '/packages/'
     | '/admin/blogs/create'
     | '/admin/destinations/create'
@@ -349,6 +377,7 @@ export interface FileRouteTypes {
     | '/admin/custom-tours/'
     | '/admin/destinations/'
     | '/admin/guides/'
+    | '/admin/hotel-bookings/'
     | '/admin/hotels/'
     | '/admin/packages/'
     | '/admin/promo-codes/'
@@ -362,14 +391,15 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/custom-tour'
-    | '/hotels'
     | '/login'
     | '/my-bookings'
     | '/signup'
     | '/blogs/$slug'
+    | '/hotels/$slug'
     | '/packages/$slug'
     | '/admin'
     | '/blogs'
+    | '/hotels'
     | '/packages'
     | '/admin/blogs/create'
     | '/admin/destinations/create'
@@ -380,6 +410,7 @@ export interface FileRouteTypes {
     | '/admin/custom-tours'
     | '/admin/destinations'
     | '/admin/guides'
+    | '/admin/hotel-bookings'
     | '/admin/hotels'
     | '/admin/packages'
     | '/admin/promo-codes'
@@ -403,9 +434,11 @@ export interface FileRouteTypes {
     | '/admin/hotels'
     | '/admin/packages'
     | '/blogs/$slug'
+    | '/hotels/$slug'
     | '/packages/$slug'
     | '/admin/'
     | '/blogs/'
+    | '/hotels/'
     | '/packages/'
     | '/admin/blogs/create'
     | '/admin/destinations/create'
@@ -416,6 +449,7 @@ export interface FileRouteTypes {
     | '/admin/custom-tours/'
     | '/admin/destinations/'
     | '/admin/guides/'
+    | '/admin/hotel-bookings/'
     | '/admin/hotels/'
     | '/admin/packages/'
     | '/admin/promo-codes/'
@@ -431,7 +465,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   CustomTourRoute: typeof CustomTourRoute
-  HotelsRoute: typeof HotelsRoute
+  HotelsRoute: typeof HotelsRouteWithChildren
   LoginRoute: typeof LoginRoute
   MyBookingsRoute: typeof MyBookingsRoute
   PackagesRoute: typeof PackagesRouteWithChildren
@@ -554,6 +588,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hotels/': {
+      id: '/hotels/'
+      path: '/'
+      fullPath: '/hotels/'
+      preLoaderRoute: typeof HotelsIndexRouteImport
+      parentRoute: typeof HotelsRoute
+    }
+    '/hotels/$slug': {
+      id: '/hotels/$slug'
+      path: '/$slug'
+      fullPath: '/hotels/$slug'
+      preLoaderRoute: typeof HotelsSlugRouteImport
+      parentRoute: typeof HotelsRoute
+    }
     '/packages/': {
       id: '/packages/'
       path: '/'
@@ -615,6 +663,13 @@ declare module '@tanstack/react-router' {
       path: '/guides'
       fullPath: '/admin/guides/'
       preLoaderRoute: typeof AdminGuidesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/hotel-bookings/': {
+      id: '/admin/hotel-bookings/'
+      path: '/hotel-bookings'
+      fullPath: '/admin/hotel-bookings/'
+      preLoaderRoute: typeof AdminHotelBookingsIndexRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/hotels/': {
@@ -741,6 +796,7 @@ interface AdminRouteChildren {
   AdminCustomToursIndexRoute: typeof AdminCustomToursIndexRoute
   AdminDestinationsIndexRoute: typeof AdminDestinationsIndexRoute
   AdminGuidesIndexRoute: typeof AdminGuidesIndexRoute
+  AdminHotelBookingsIndexRoute: typeof AdminHotelBookingsIndexRoute
   AdminPromoCodesIndexRoute: typeof AdminPromoCodesIndexRoute
   AdminDestinationsIdEditRoute: typeof AdminDestinationsIdEditRoute
 }
@@ -755,11 +811,25 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCustomToursIndexRoute: AdminCustomToursIndexRoute,
   AdminDestinationsIndexRoute: AdminDestinationsIndexRoute,
   AdminGuidesIndexRoute: AdminGuidesIndexRoute,
+  AdminHotelBookingsIndexRoute: AdminHotelBookingsIndexRoute,
   AdminPromoCodesIndexRoute: AdminPromoCodesIndexRoute,
   AdminDestinationsIdEditRoute: AdminDestinationsIdEditRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface HotelsRouteChildren {
+  HotelsSlugRoute: typeof HotelsSlugRoute
+  HotelsIndexRoute: typeof HotelsIndexRoute
+}
+
+const HotelsRouteChildren: HotelsRouteChildren = {
+  HotelsSlugRoute: HotelsSlugRoute,
+  HotelsIndexRoute: HotelsIndexRoute,
+}
+
+const HotelsRouteWithChildren =
+  HotelsRoute._addFileChildren(HotelsRouteChildren)
 
 interface PackagesRouteChildren {
   PackagesSlugRoute: typeof PackagesSlugRoute
@@ -781,7 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   CustomTourRoute: CustomTourRoute,
-  HotelsRoute: HotelsRoute,
+  HotelsRoute: HotelsRouteWithChildren,
   LoginRoute: LoginRoute,
   MyBookingsRoute: MyBookingsRoute,
   PackagesRoute: PackagesRouteWithChildren,

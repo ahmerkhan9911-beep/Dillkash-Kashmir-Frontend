@@ -8,6 +8,7 @@ export interface CustomTourRequest {
   email: string;
   preferred_date: string | null;
   persons: number;
+  duration: string;
   hotel_preference: string;
   transport_preference: string;
   preferred_destinations: string[];
@@ -21,6 +22,7 @@ export async function submitCustomTour(data: {
   phoneNumber: string;
   preferredDate?: string;
   persons?: number;
+  duration?: string;
   hotelPreference?: string;
   transportPreference?: string;
   preferredDestinations?: string[];

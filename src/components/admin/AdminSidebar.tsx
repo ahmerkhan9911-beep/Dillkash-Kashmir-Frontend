@@ -11,6 +11,7 @@ import {
   FileText,
   CalendarCheck,
   TicketPercent,
+  Building,
 } from "lucide-react";
 import logoHorizontal from "@/assets/dillkash-logo-horizontal.png";
 import logoIcon from "@/assets/dillkash-logo-icon.png";
@@ -25,6 +26,7 @@ const NAV_LINKS = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true, badge: false },
   { to: "/admin/packages", label: "Packages", icon: Package, exact: false, badge: false },
   { to: "/admin/hotels", label: "Hotels", icon: Hotel, exact: false, badge: false },
+  { to: "/admin/hotel-bookings", label: "Hotel Bookings", icon: Building, exact: false, badge: false },
   { to: "/admin/destinations", label: "Destinations", icon: MapPin, exact: false, badge: false },
   { to: "/admin/guides", label: "Tour Guides", icon: UserCheck, exact: false, badge: false, badgeCount: 0 },
   { to: "/admin/blogs", label: "Blogs & Updates", icon: FileText, exact: false, badge: false, badgeCount: 0 },

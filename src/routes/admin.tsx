@@ -26,7 +26,7 @@ function AdminLayout() {
   }
 
   if (!isAuthenticated) {
-    navigate({ to: "/login" });
+    navigate({ to: "/login", search: { redirect: "/admin" } });
     return null;
   }
 

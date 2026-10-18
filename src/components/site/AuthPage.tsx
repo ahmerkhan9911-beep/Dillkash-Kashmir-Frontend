@@ -25,7 +25,7 @@ type AuthMode = "signin" | "signup";
 
 interface AuthPageProps {
   initialMode?: AuthMode;
-  redirectUrl?: string;
+  redirectUrl?: string | undefined;
 }
 
 /* ─────────────────────────── component ─────────────────────── */
@@ -104,15 +104,15 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (signupForm.full_name.trim().length < 2)
-      errs.full_name = "Please enter your full name";
+      errs["full_name"] = "Please enter your full name";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupForm.email))
-      errs.email = "Enter a valid email address";
+      errs["email"] = "Enter a valid email address";
     if (!/^(\+?92|0)?\d{10,11}$/.test(signupForm.phone.replace(/[\s-]/g, "")))
-      errs.phone = "Enter a valid phone number (e.g. 03001234567)";
+      errs["phone"] = "Enter a valid phone number (e.g. 03001234567)";
     if (signupForm.password.length < 6)
-      errs.password = "Password must be at least 6 characters";
+      errs["password"] = "Password must be at least 6 characters";
     if (signupForm.password !== signupForm.confirm_password)
-      errs.confirm_password = "Passwords do not match";
+      errs["confirm_password"] = "Passwords do not match";
     setFieldErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -353,7 +353,7 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
                     className={inputCls("full_name")}
                   />
                 </div>
-                <FieldError msg={fieldErrors.full_name} />
+                <FieldError msg={fieldErrors["full_name"]} />
               </div>
 
               {/* Email */}
@@ -373,7 +373,7 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
                     className={inputCls("email")}
                   />
                 </div>
-                <FieldError msg={fieldErrors.email} />
+                <FieldError msg={fieldErrors["email"]} />
               </div>
 
               {/* Phone */}
@@ -393,7 +393,7 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
                     className={inputCls("phone")}
                   />
                 </div>
-                <FieldError msg={fieldErrors.phone} />
+                <FieldError msg={fieldErrors["phone"]} />
               </div>
 
               {/* City */}
@@ -435,7 +435,7 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
                   />
                   <PwToggle show={showSignupPw} onClick={() => setShowSignupPw(!showSignupPw)} />
                 </div>
-                <FieldError msg={fieldErrors.password} />
+                <FieldError msg={fieldErrors["password"]} />
               </div>
 
               {/* Confirm Password */}
@@ -455,7 +455,7 @@ export default function AuthPage({ initialMode = "signin", redirectUrl }: AuthPa
                     className={inputCls("confirm_password")}
                   />
                 </div>
-                <FieldError msg={fieldErrors.confirm_password} />
+                <FieldError msg={fieldErrors["confirm_password"]} />
               </div>
 
               {/* Submit */}
@@ -559,7 +559,7 @@ function CheckItem({ children }: { children: ReactNode }) {
   );
 }
 
-function FieldError({ msg }: { msg?: string }) {
+function FieldError({ msg }: { msg?: string | undefined }) {
   if (!msg) return null;
   return <p className="mt-1 text-xs font-medium text-red-500">{msg}</p>;
 }

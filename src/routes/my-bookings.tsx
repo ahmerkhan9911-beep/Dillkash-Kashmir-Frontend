@@ -1,35 +1,43 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Clock, CheckCircle, XCircle, CalendarDays, Users, BedDouble, MapPin, Car, Hotel } from "lucide-react";
+import {
+  Clock,
+  CheckCircle,
+  XCircle,
+  CalendarDays,
+  Users,
+  BedDouble,
+  MapPin,
+  Car,
+  Hotel as HotelIcon,
+  Timer,
+  Building,
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { getMyBookings, type Booking } from "@/services/bookings";
 import { getMyCustomTours, type CustomTourRequest } from "@/services/custom-tours";
+import { getMyHotelBookings, type HotelBooking } from "@/services/hotels";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { cn } from "@/lib/utils";
 import { formatPKR } from "@/data/site";
 
 export const Route = createFileRoute("/my-bookings")({
-  beforeLoad: ({ context, location }) => {
-    // Auth guard: if not authenticated, redirect to login
-    // We can't access `isAuthenticated` directly from context here because context wasn't explicitly provided with it.
-    // However, AuthContext provides user state. For simplicity, we check in the component, but we can also do a basic check here if we had access to the store.
-  },
   head: () => ({
     meta: [
       { title: "My Bookings — DillKash Kashmir" },
-      { name: "description", content: "Track your tour booking and custom tour request statuses." },
+      { name: "description", content: "Track your tour booking, hotel stays, and custom tour request statuses." },
     ],
   }),
   component: MyBookingsPage,
 });
 
 const STATUS_STYLES: Record<string, string> = {
-  Pending: "bg-amber-100 text-amber-700",
-  Confirmed: "bg-emerald-100 text-emerald-700",
-  Approved: "bg-emerald-100 text-emerald-700",
-  Cancelled: "bg-rose-100 text-rose-700",
-  Rejected: "bg-rose-100 text-rose-700",
+  Pending: "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400",
+  Confirmed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  Approved: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400",
+  Cancelled: "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400",
+  Rejected: "bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400",
 };
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -51,20 +59,23 @@ function formatDate(dateStr: string | null) {
 
 function MyBookingsPage() {
   const { isAuthenticated, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"bookings" | "custom">("bookings");
+  const [activeTab, setActiveTab] = useState<"bookings" | "hotels" | "custom">("bookings");
 
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [hotelBookings, setHotelBookings] = useState<HotelBooking[]>([]);
   const [customTours, setCustomTours] = useState<CustomTourRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch data
   const fetchData = async () => {
     try {
-      const [bData, cData] = await Promise.all([
-        getMyBookings(),
-        getMyCustomTours(),
+      const [bData, hData, cData] = await Promise.all([
+        getMyBookings().catch(() => []),
+        getMyHotelBookings().catch(() => []),
+        getMyCustomTours().catch(() => []),
       ]);
       setBookings(bData);
+      setHotelBookings(hData);
       setCustomTours(cData);
     } catch (err) {
       console.error("Failed to fetch user requests", err);
@@ -106,13 +117,13 @@ function MyBookingsPage() {
           <SectionHeader
             align="left"
             title={`Welcome back, ${user?.full_name?.split(" ")[0]}!`}
-            subtitle="Track your upcoming tours and custom requests in real-time."
+            subtitle="Track your upcoming tours, hotel stays, and custom requests in real-time."
           />
         </Reveal>
 
         {/* Tabs */}
         <Reveal delay={0.1}>
-          <div className="mt-8 flex gap-2 border-b border-border pb-4">
+          <div className="mt-8 flex flex-wrap gap-2 border-b border-border pb-4">
             <button
               onClick={() => setActiveTab("bookings")}
               className={cn(
@@ -122,7 +133,18 @@ function MyBookingsPage() {
                   : "bg-card text-foreground hover:bg-secondary"
               )}
             >
-              Tour Bookings ({bookings.length})
+              Tour Packages ({bookings.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("hotels")}
+              className={cn(
+                "rounded-xl px-5 py-2.5 text-sm font-bold transition-all",
+                activeTab === "hotels"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "bg-card text-foreground hover:bg-secondary"
+              )}
+            >
+              Hotel Stays ({hotelBookings.length})
             </button>
             <button
               onClick={() => setActiveTab("custom")}
@@ -148,11 +170,12 @@ function MyBookingsPage() {
               </div>
             ) : (
               <>
+                {/* ── Tab: Tour Packages ── */}
                 {activeTab === "bookings" && (
                   <div className="grid gap-4">
                     {bookings.length === 0 ? (
                       <div className="rounded-3xl border border-dashed border-border bg-card py-20 text-center">
-                        <p className="text-sm font-semibold text-muted-foreground">No bookings found.</p>
+                        <p className="text-sm font-semibold text-muted-foreground">No tour bookings found.</p>
                         <Link to="/packages" className="mt-4 inline-block text-sm font-bold text-primary hover:underline">
                           Browse our packages
                         </Link>
@@ -196,6 +219,77 @@ function MyBookingsPage() {
                   </div>
                 )}
 
+                {/* ── Tab: Hotel Stays ── */}
+                {activeTab === "hotels" && (
+                  <div className="grid gap-4">
+                    {hotelBookings.length === 0 ? (
+                      <div className="rounded-3xl border border-dashed border-border bg-card py-20 text-center">
+                        <Building size={36} className="mx-auto mb-2 text-muted-foreground/60" />
+                        <p className="text-sm font-semibold text-muted-foreground">No hotel bookings yet.</p>
+                        <Link to="/hotels" className="mt-4 inline-block text-sm font-bold text-primary hover:underline">
+                          Explore Kashmir Hotels
+                        </Link>
+                      </div>
+                    ) : (
+                      hotelBookings.map((hb) => (
+                        <div
+                          key={hb.id}
+                          className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-center"
+                        >
+                          <div className="flex-1 grid gap-2">
+                            <div className="flex items-center gap-3">
+                              <h3 className="font-heading text-lg font-bold text-foreground">
+                                {hb.hotel_name || `Hotel Stay #${hb.hotel_id}`}
+                              </h3>
+                              <span
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold",
+                                  STATUS_STYLES[hb.status]
+                                )}
+                              >
+                                {STATUS_ICONS[hb.status]}
+                                {hb.status}
+                              </span>
+                            </div>
+
+                            {hb.hotel_location && (
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <MapPin size={13} className="text-primary shrink-0" />
+                                <span>{hb.hotel_location}</span>
+                              </div>
+                            )}
+
+                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                              <span className="inline-flex items-center gap-1.5">
+                                <CalendarDays size={16} />
+                                {formatDate(hb.check_in_date)} → {formatDate(hb.check_out_date)}
+                              </span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <BedDouble size={16} />
+                                {hb.room_type} ({hb.rooms_count} {hb.rooms_count === 1 ? "room" : "rooms"})
+                              </span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <Users size={16} />
+                                {hb.guests_count} Guests
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="text-right sm:shrink-0">
+                            <p className="font-heading text-lg font-extrabold text-foreground">
+                              {formatPKR(hb.total_price)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Reserved on {new Date(hb.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {/* ── Tab: Custom Requests ── */}
                 {activeTab === "custom" && (
                   <div className="grid gap-4">
                     {customTours.length === 0 ? (
@@ -222,7 +316,10 @@ function MyBookingsPage() {
                             <div className="grid gap-y-2 text-sm text-muted-foreground sm:grid-cols-2">
                               <span className="inline-flex items-center gap-2"><CalendarDays size={16} className="text-primary" /> {formatDate(req.preferred_date)}</span>
                               <span className="inline-flex items-center gap-2"><Users size={16} className="text-primary" /> Total Persons: {req.persons}</span>
-                              <span className="inline-flex items-center gap-2"><Hotel size={16} className="text-primary" /> {req.hotel_preference || "Any Hotel"}</span>
+                              {req.duration && (
+                                <span className="inline-flex items-center gap-2"><Timer size={16} className="text-primary" /> Duration: {req.duration}</span>
+                              )}
+                              <span className="inline-flex items-center gap-2"><HotelIcon size={16} className="text-primary" /> {req.hotel_preference || "Any Hotel"}</span>
                               <span className="inline-flex items-center gap-2"><Car size={16} className="text-primary" /> {req.transport_preference || "Any Transport"}</span>
                             </div>
 

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Check, Send, Car, Truck, Bus, LogIn, Shield } from "lucide-react";
-import { destinations, whatsappLink, formatPKR } from "@/data/site";
+import { useState } from "react";
+import { Check, Send, Car, Truck, Bus, LogIn, Shield, CalendarDays, Clock } from "lucide-react";
+import { destinations, whatsappLink } from "@/data/site";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeader } from "@/components/site/SectionHeader";
 import { images } from "@/data/site";
@@ -32,6 +32,7 @@ export const Route = createFileRoute("/custom-tour")({
 interface CustomForm {
   date: string;
   persons: number;
+  duration: string;
   hotel: string;
   transportPreference: string;
   destinations: string[];
@@ -41,6 +42,7 @@ interface CustomForm {
 const initial: CustomForm = {
   date: "",
   persons: 1,
+  duration: "5 Days",
   hotel: "3 Star",
   transportPreference: "Standard Car",
   destinations: [],
@@ -53,6 +55,15 @@ const TRANSPORT_OPTIONS = [
   { value: "Grand Cabin / Hiace", subtitle: "For families/groups", icon: Bus },
 ] as const;
 
+const DURATION_OPTIONS = [
+  "3 Days",
+  "5 Days",
+  "7 Days",
+  "10 Days",
+  "14 Days",
+  "Custom",
+];
+
 function CustomTourPage() {
   const { user, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -62,13 +73,6 @@ function CustomTourPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState("");
-
-  // ── Dynamic estimated cost calculation ──
-  const ADULT_BASE_COST = user?.city === "Islamabad" ? 18000 : 20000;
-  const { totalEstimated } = useMemo(() => {
-    const total = Number(form.persons) * ADULT_BASE_COST;
-    return { totalEstimated: total };
-  }, [form.persons, ADULT_BASE_COST]);
 
   const toggleDestination = (name: string) =>
     setForm((f) => ({
@@ -103,6 +107,7 @@ function CustomTourPage() {
         phoneNumber: user?.phone || "",
         preferredDate: form.date,
         persons: form.persons,
+        duration: form.duration,
         hotelPreference: form.hotel,
         transportPreference: form.transportPreference,
         preferredDestinations: form.destinations,
@@ -171,17 +176,23 @@ function CustomTourPage() {
                 </Link>
               </div>
             ) : sent ? (
-              <div className="mt-8 rounded-2xl bg-secondary p-8 text-center">
-                <div className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground">
-                  <Check size={28} />
+              /* ── Success State ── */
+              <div className="mt-8 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 p-8 text-center dark:border-emerald-800/40 dark:from-emerald-950/40 dark:to-teal-950/30">
+                <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-emerald-600 text-white shadow-lg">
+                  <Check size={32} />
                 </div>
-                <p className="font-heading text-lg font-bold text-foreground">Request Received!</p>
-                <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
-                  Thanks {user?.full_name?.split(" ")[0]} — a tour planner will call{" "}
-                  <strong className="text-foreground">{user?.phone}</strong> within
-                  a few hours with your custom itinerary.
+                <p className="font-heading text-xl font-extrabold text-foreground">
+                  Request Submitted!
                 </p>
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
+                  Thanks! Our Kashmir Travel Experts will calculate your customized tour plan and the best price, and contact you within 24 hours.
+                </p>
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                  <Clock size={12} />
+                  We'll reach you at{" "}
+                  <strong>{user?.phone}</strong>
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground">
                   Track your request status on{" "}
                   <Link to="/my-bookings" className="font-bold text-primary hover:underline">
                     My Bookings
@@ -229,9 +240,12 @@ function CustomTourPage() {
                   </div>
                 )}
 
+                {/* Row 1: Preferred Date + Travelers */}
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="c-date" className="mb-1.5 block text-sm font-semibold text-foreground">Preferred Date</label>
+                    <label htmlFor="c-date" className="mb-1.5 block text-sm font-semibold text-foreground">
+                      Preferred Date
+                    </label>
                     <input
                       id="c-date"
                       type="date"
@@ -242,7 +256,9 @@ function CustomTourPage() {
                     {errors.date && <p className="mt-1 text-xs font-medium text-destructive">{errors.date}</p>}
                   </div>
                   <div>
-                    <label htmlFor="c-persons" className="mb-1.5 block text-sm font-semibold text-foreground">Travelers (Persons)</label>
+                    <label htmlFor="c-persons" className="mb-1.5 block text-sm font-semibold text-foreground">
+                      Travelers (Persons)
+                    </label>
                     <input
                       id="c-persons"
                       type="number"
@@ -256,6 +272,42 @@ function CustomTourPage() {
                   </div>
                 </div>
 
+                {/* Row 2: Trip Duration */}
+                <div>
+                  <span className="mb-1.5 flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <CalendarDays size={16} className="text-primary" />
+                    Trip Duration
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {DURATION_OPTIONS.map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        onClick={() => setForm({ ...form, duration: d })}
+                        aria-pressed={form.duration === d}
+                        className={cn(
+                          "rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                          form.duration === d
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background text-foreground hover:bg-secondary",
+                        )}
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Custom duration input shown when "Custom" is selected */}
+                  {form.duration === "Custom" && (
+                    <input
+                      type="text"
+                      placeholder="e.g. 12 Days, 3 weeks…"
+                      className={`mt-2 ${inputCls()}`}
+                      onChange={(e) => setForm({ ...form, duration: e.target.value || "Custom" })}
+                    />
+                  )}
+                </div>
+
+                {/* Hotel Preference */}
                 <div>
                   <span className="mb-1.5 block text-sm font-semibold text-foreground">Hotel Preference</span>
                   <div className="flex gap-2">
@@ -278,6 +330,7 @@ function CustomTourPage() {
                   </div>
                 </div>
 
+                {/* Transport Preference */}
                 <div>
                   <span className="mb-1.5 block text-sm font-semibold text-foreground">Transport Preference</span>
                   <div className="grid gap-2 sm:grid-cols-3">
@@ -308,6 +361,7 @@ function CustomTourPage() {
                   </div>
                 </div>
 
+                {/* Preferred Destinations */}
                 <div>
                   <span className="mb-1.5 block text-sm font-semibold text-foreground">Preferred Destinations</span>
                   <div className="flex flex-wrap gap-2">
@@ -336,6 +390,7 @@ function CustomTourPage() {
                   )}
                 </div>
 
+                {/* Message */}
                 <div>
                   <label htmlFor="c-msg" className="mb-1.5 block text-sm font-semibold text-foreground">Message</label>
                   <textarea
@@ -348,34 +403,6 @@ function CustomTourPage() {
                   />
                 </div>
 
-                {/* ── Total Estimated Cost Display ── */}
-                <div
-                  className="relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-r from-emerald-50 via-emerald-50/80 to-teal-50 p-4 dark:border-emerald-800/40 dark:from-emerald-950/40 dark:via-emerald-950/30 dark:to-teal-950/30"
-                >
-                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-200/20 blur-2xl dark:bg-emerald-500/10" />
-                  <div className="relative flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700/70 dark:text-emerald-400/70">
-                        Total Estimated Cost
-                      </p>
-                      <p className="mt-0.5 text-[11px] text-emerald-600/60 dark:text-emerald-500/50">
-                        {Number(form.persons)} person{form.persons !== 1 ? "s" : ""} × {formatPKR(ADULT_BASE_COST)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-heading text-2xl font-extrabold tracking-tight text-emerald-800 dark:text-emerald-300">
-                        {formatPKR(totalEstimated)}
-                      </p>
-                      <p className="mt-1 text-[10px] text-emerald-600/70 dark:text-emerald-400/60">
-                        Estimated from {user?.city || "Lahore"}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="relative mt-2.5 text-[11px] leading-relaxed text-emerald-600/70 dark:text-emerald-500/50">
-                    *This is an estimated base cost. Final quote will be provided by our tour planners.
-                  </p>
-                </div>
-
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -386,7 +413,7 @@ function CustomTourPage() {
                   ) : (
                     <>
                       <Send size={16} />
-                      Submit Request
+                      Request Custom Itinerary &amp; Quote
                     </>
                   )}
                 </button>

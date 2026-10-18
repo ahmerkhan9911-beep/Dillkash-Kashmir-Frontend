@@ -2,9 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import AuthPage from "@/components/site/AuthPage";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    redirect: search.redirect as string | undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
+    const r = search["redirect"];
+    return typeof r === "string" ? { redirect: r } : {};
+  },
   head: () => ({
     meta: [
       { title: "Login — DillKash Kashmir" },

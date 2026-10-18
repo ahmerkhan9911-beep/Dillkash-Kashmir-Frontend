@@ -83,13 +83,29 @@ export async function api<T = unknown>(
   const url = `${API_BASE}${endpoint}`;
   let res: Response;
 
+  const doFetch = () => fetch(url, reqInit);
+
   try {
-    res = await fetch(url, reqInit);
+    res = await doFetch();
+    if (res.status === 503 && method.toUpperCase() === "GET") {
+      await new Promise((r) => setTimeout(r, 400));
+      res = await doFetch();
+    }
   } catch (networkErr) {
-    // fetch() itself threw — network down, DNS failure, CORS preflight blocked, etc.
-    const msg = networkErr instanceof Error ? networkErr.message : String(networkErr);
-    console.error(`[API] Network error → ${method} ${url}`, networkErr);
-    throw new Error(`Network error: ${msg}. Check your internet connection or CORS configuration.`);
+    if (method.toUpperCase() === "GET") {
+      try {
+        await new Promise((r) => setTimeout(r, 400));
+        res = await doFetch();
+      } catch {
+        const msg = networkErr instanceof Error ? networkErr.message : String(networkErr);
+        console.error(`[API] Network error → ${method} ${url}`, networkErr);
+        throw new Error(`Network error: ${msg}. Check your internet connection or CORS configuration.`);
+      }
+    } else {
+      const msg = networkErr instanceof Error ? networkErr.message : String(networkErr);
+      console.error(`[API] Network error → ${method} ${url}`, networkErr);
+      throw new Error(`Network error: ${msg}. Check your internet connection or CORS configuration.`);
+    }
   }
 
   // Safely parse response — server might return HTML (e.g. a 404/500 page) instead of JSON

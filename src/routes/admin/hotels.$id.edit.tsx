@@ -28,7 +28,7 @@ function EditHotelPage() {
   }, [id]);
 
   const handleSubmit = async (data: HotelFormData) => {
-    await updateHotel(Number(id), data);
+    await updateHotel(Number(id), data as unknown as Partial<Hotel>);
     navigate({ to: "/admin/hotels" });
   };
 
@@ -75,6 +75,11 @@ function EditHotelPage() {
           amenities: hotel.amenities,
           is_active: hotel.is_active,
           featured: hotel.featured,
+          checkInTime: hotel.checkInTime,
+          checkOutTime: hotel.checkOutTime,
+          cancellationPolicy: hotel.cancellationPolicy,
+          houseRules: hotel.houseRules,
+          rooms: hotel.rooms ?? [],
         }}
         onSubmit={handleSubmit}
         onCancel={() => navigate({ to: "/admin/hotels" })}
