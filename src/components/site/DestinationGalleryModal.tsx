@@ -1,8 +1,19 @@
 import { useEffect, useState, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, MapPin, Images } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, MapPin, Images, Film } from "lucide-react";
 import type { DestinationItem } from "@/services/destinations";
 import { resolveImageUrl } from "@/lib/resolveImage";
 import { images as siteImages } from "@/data/site";
+
+/** Returns true when a gallery URL belongs to a video (Cloudinary video or by extension). */
+function isVideoUrl(url: string): boolean {
+  const lower = url.toLowerCase().split("?")[0];
+  return (
+    lower.includes("/video/upload/") ||
+    lower.endsWith(".mp4") ||
+    lower.endsWith(".mov") ||
+    lower.endsWith(".webm")
+  );
+}
 
 interface DestinationGalleryModalProps {
   destination: DestinationItem | null;
@@ -115,15 +126,28 @@ export function DestinationGalleryModal({
       <div className="relative my-4 flex flex-1 items-center justify-center overflow-hidden">
         {images.length > 0 ? (
           <div className="relative flex h-full max-h-[70vh] w-full max-w-5xl items-center justify-center">
-            <img
-              key={images[activeIndex]}
-              src={images[activeIndex]}
-              alt={`${destination.name} - Photo ${activeIndex + 1}`}
-              onError={(e) => {
-                e.currentTarget.src = siteImages.heroKashmir;
-              }}
-              className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl transition-all duration-300 animate-in fade-in zoom-in-95"
-            />
+            {isVideoUrl(images[activeIndex] ?? "") ? (
+              <video
+                key={images[activeIndex]}
+                src={images[activeIndex]}
+                controls
+                muted
+                autoPlay
+                loop
+                className="max-h-full max-w-full rounded-2xl shadow-2xl transition-all duration-300 animate-in fade-in zoom-in-95"
+                aria-label={`${destination.name} - Video ${activeIndex + 1}`}
+              />
+            ) : (
+              <img
+                key={images[activeIndex]}
+                src={images[activeIndex]}
+                alt={`${destination.name} - Photo ${activeIndex + 1}`}
+                onError={(e) => {
+                  e.currentTarget.src = siteImages.heroKashmir;
+                }}
+                className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl transition-all duration-300 animate-in fade-in zoom-in-95"
+              />
+            )}
           </div>
         ) : (
           <div className="text-center text-white/60">
@@ -171,16 +195,29 @@ export function DestinationGalleryModal({
                     ? "ring-2 ring-primary ring-offset-2 ring-offset-black scale-105 opacity-100 shadow-md"
                     : "opacity-50 hover:opacity-90 hover:scale-100"
                 }`}
-                aria-label={`View photo ${idx + 1}`}
+                aria-label={`View ${isVideoUrl(img) ? "video" : "photo"} ${idx + 1}`}
               >
-                <img
-                  src={img}
-                  alt={`Thumbnail ${idx + 1}`}
-                  onError={(e) => {
-                    e.currentTarget.src = siteImages.heroKashmir;
-                  }}
-                  className="h-full w-full object-cover"
-                />
+                {isVideoUrl(img) ? (
+                  <>
+                    <video
+                      src={img}
+                      muted
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <Film size={16} className="text-white" />
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    onError={(e) => {
+                      e.currentTarget.src = siteImages.heroKashmir;
+                    }}
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </button>
             ))}
           </div>

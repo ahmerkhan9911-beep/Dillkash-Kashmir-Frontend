@@ -142,14 +142,20 @@ export async function api<T = unknown>(
 
 
 /**
- * Upload a single image file to the server.
+ * Upload a single file (image, HEIC, or short video clip) to Cloudinary via the server.
  * Uses raw fetch with FormData (not JSON) so multer can parse the multipart body.
- * Returns the public URL string on success, e.g. "/uploads/<uuid>.jpg"
+ *
+ * Accepted types:
+ *   Images : JPG, PNG, WebP, HEIC/HEIF (iPhone native — Cloudinary auto-converts for web)
+ *   Videos : MP4, MOV (.quicktime), WebM — max ~20 MB / ~1 minute
+ *
+ * Returns the Cloudinary secure URL string on success.
  */
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadMedia(file: File): Promise<string> {
   const token = getToken();
   const formData = new FormData();
-  formData.append("image", file);
+  // Field name must match the server's upload.single("file") call
+  formData.append("file", file);
 
   const res = await fetch(`${API_BASE}/upload`, {
     method: "POST",
@@ -163,5 +169,8 @@ export async function uploadImage(file: File): Promise<string> {
     throw new Error(data.error || "Upload failed");
   }
 
-  return (data as { url: string }).url;
+  return (data as { url: string; resourceType: string }).url;
 }
+
+/** @deprecated Use uploadMedia instead. Kept for backwards compatibility. */
+export const uploadImage = uploadMedia;

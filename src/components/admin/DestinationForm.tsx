@@ -179,7 +179,7 @@ export function DestinationForm({
           Destination Gallery
         </legend>
         <p className="mb-4 text-xs text-muted-foreground">
-          Photos displayed in the interactive lightbox when visitors click this destination card.
+          Photos &amp; short video clips displayed in the interactive lightbox. Supports JPG, PNG, WebP, HEIC/HEIF (iPhone) and MP4/MOV/WebM video clips.
         </p>
         <GalleryUploader
           value={form.gallery}

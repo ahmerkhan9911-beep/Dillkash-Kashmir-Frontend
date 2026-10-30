@@ -1,17 +1,47 @@
 import { useRef, useState, useCallback } from "react";
-import { ImagePlus, Loader2, X, AlertCircle } from "lucide-react";
-import { uploadImage } from "@/services/api";
+import { ImagePlus, Film, Loader2, X, AlertCircle } from "lucide-react";
+import { uploadMedia } from "@/services/api";
 import { resolveImageUrl } from "@/lib/resolveImage";
 
 /* ─────────────────────────────────────────────────────────────────── *
- * Validation (mirrors server-side)                                     *
+ * Allowed types / size limits                                          *
+ *                                                                      *
+ * Images  : JPG, PNG, WebP, HEIC/HEIF (iPhone native)                 *
+ * Videos  : MP4, QuickTime (.mov), WebM — short clips (≤20 MB ~1 min) *
+ *                                                                      *
+ * HEIC MIME note: Some OS/browser combos report HEIC files as         *
+ * 'application/octet-stream' so we validate by file EXTENSION, not    *
+ * mimetype, to avoid false rejections.                                 *
  * ─────────────────────────────────────────────────────────────────── */
-const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-const MAX_BYTES = 5 * 1024 * 1024;
+
+const ALLOWED_IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"]);
+const ALLOWED_VIDEO_EXTS = new Set(["mp4", "mov", "webm"]);
+
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB
+const MAX_VIDEO_BYTES = 20 * 1024 * 1024; // 20 MB
+
+function getExt(file: File): string {
+  return file.name.split(".").pop()?.toLowerCase() ?? "";
+}
+
+function isVideoFile(file: File): boolean {
+  return ALLOWED_VIDEO_EXTS.has(getExt(file));
+}
 
 function validateFile(file: File): string | null {
-  if (!ALLOWED_TYPES.includes(file.type)) return "Only JPG, PNG, and WebP are allowed.";
-  if (file.size > MAX_BYTES) return "File must be smaller than 5 MB.";
+  const ext = getExt(file);
+  const isVideo = ALLOWED_VIDEO_EXTS.has(ext);
+  const isImage = ALLOWED_IMAGE_EXTS.has(ext);
+
+  if (!isVideo && !isImage) {
+    return `Unsupported file ".${ext}". Allowed: JPG, PNG, WebP, HEIC/HEIF, MP4, MOV, WebM.`;
+  }
+  if (isVideo && file.size > MAX_VIDEO_BYTES) {
+    return `Video "${file.name}" exceeds 20 MB. Please use a shorter clip.`;
+  }
+  if (isImage && file.size > MAX_IMAGE_BYTES) {
+    return `Image "${file.name}" exceeds 15 MB.`;
+  }
   return null;
 }
 
@@ -20,12 +50,8 @@ function validateFile(file: File): string | null {
  * ─────────────────────────────────────────────────────────────────── */
 interface PendingThumb {
   id: string;
-  /**
-   * Local blob URL created with URL.createObjectURL() for instant preview
-   * while the upload is in progress. NOT revoked until the real <img>
-   * fires onLoad to avoid a flash of a broken image.
-   */
-  preview: string;
+  preview: string; // Local blob URL for instant preview
+  isVideo: boolean;
   error: string | null;
 }
 
@@ -36,6 +62,19 @@ interface GalleryUploaderProps {
   value: string[];
   onChange: (urls: string[]) => void;
   onUploadingChange?: (uploading: boolean) => void;
+}
+
+/* ─────────────────────────────────────────────────────────────────── *
+ * Helper: detect whether a URL is a video                             *
+ * ─────────────────────────────────────────────────────────────────── */
+function isVideoUrl(url: string): boolean {
+  const lower = url.toLowerCase().split("?")[0]; // strip query params
+  return (
+    lower.includes("/video/upload/") || // Cloudinary video URL
+    lower.endsWith(".mp4") ||
+    lower.endsWith(".mov") ||
+    lower.endsWith(".webm")
+  );
 }
 
 /* ─────────────────────────────────────────────────────────────────── *
@@ -60,20 +99,7 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
     [onUploadingChange]
   );
 
-  /* ── process a batch of files ──────────────────────────────────── *
-   *                                                                   *
-   * FIX: stale closure on `value`                                     *
-   *   Each parallel upload used `onChange([...value, url])` which     *
-   *   captured the SAME stale snapshot of `value` — so 3 parallel    *
-   *   uploads would each produce [url1], [url2], [url3] and only the  *
-   *   last one would survive.                                          *
-   *                                                                   *
-   *   Fix: collect all resolved URLs into a local array, then call    *
-   *   onChange ONCE at the end with the full accumulated list.         *
-   *   We also use a ref to the latest `value` so subsequent batches   *
-   *   don't overwrite earlier ones.                                    *
-   * ─────────────────────────────────────────────────────────────── */
-  // Keep a ref that always holds the latest gallery array
+  // Keep a ref that always holds the latest gallery array to avoid stale closures
   const valueRef = useRef<string[]>(value);
   valueRef.current = value;
 
@@ -82,12 +108,12 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
       setGlobalError(null);
       const fileArr = Array.from(files);
 
-      // Client-side validation
+      // Client-side validation (extension + size)
       const errors: string[] = [];
       const valid: File[] = [];
       for (const f of fileArr) {
         const e = validateFile(f);
-        if (e) errors.push(`"${f.name}": ${e}`);
+        if (e) errors.push(e);
         else valid.push(f);
       }
       if (errors.length) setGlobalError(errors.join(" · "));
@@ -97,6 +123,7 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
       const thumbs: PendingThumb[] = valid.map((f) => ({
         id: `${Date.now()}-${Math.random()}`,
         preview: URL.createObjectURL(f),
+        isVideo: isVideoFile(f),
         error: null,
       }));
       setPending((prev) => [...prev, ...thumbs]);
@@ -110,10 +137,8 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
           if (!thumb) return;
           notifyParent(thumb.id, false);
           try {
-            const url = await uploadImage(file);
+            const url = await uploadMedia(file);
             resolvedUrls.push(url);
-            // Remove the pending thumb — the blob is kept alive until the
-            // real <img> fires onLoad (handled in the thumb render below).
             setPending((prev) => prev.filter((t) => t.id !== thumb.id));
           } catch (err) {
             const msg = err instanceof Error ? err.message : "Upload failed";
@@ -126,20 +151,16 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
         })
       );
 
-      // Single onChange call with the full accumulated list — no stale snapshots
+      // Single onChange call with full accumulated list — no stale snapshots
       if (resolvedUrls.length > 0) {
         onChange([...valueRef.current, ...resolvedUrls]);
       }
     },
     [onChange, notifyParent]
-    // Note: `value` intentionally NOT in deps — we use valueRef.current to avoid stale closure
   );
 
   /* ── drag & drop ── */
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(true);
-  };
+  const onDragOver = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
   const onDragLeave = () => setDragging(false);
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -151,12 +172,8 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
     e.target.value = "";
   };
 
-  /* ── remove an already-uploaded image ── */
-  const removeUrl = (idx: number) => {
-    onChange(value.filter((_, i) => i !== idx));
-  };
+  const removeUrl = (idx: number) => onChange(value.filter((_, i) => i !== idx));
 
-  /* ── dismiss a failed pending thumb ── */
   const dismissPending = (id: string) => {
     setPending((prev) => {
       const thumb = prev.find((t) => t.id === id);
@@ -173,15 +190,24 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
       {/* Thumbnail grid */}
       {hasThumbs && (
         <div className="mb-3 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
-          {/* Already-uploaded images */}
-          {value.map((url, idx) => (
-            <UploadedThumb
-              key={`uploaded-${idx}-${url}`}
-              src={resolveImageUrl(url)}
-              label={`Gallery image ${idx + 1}`}
-              onRemove={() => removeUrl(idx)}
-            />
-          ))}
+          {/* Already-uploaded media items */}
+          {value.map((url, idx) =>
+            isVideoUrl(url) ? (
+              <UploadedVideoThumb
+                key={`uploaded-${idx}-${url}`}
+                src={resolveImageUrl(url)}
+                label={`Gallery video ${idx + 1}`}
+                onRemove={() => removeUrl(idx)}
+              />
+            ) : (
+              <UploadedThumb
+                key={`uploaded-${idx}-${url}`}
+                src={resolveImageUrl(url)}
+                label={`Gallery image ${idx + 1}`}
+                onRemove={() => removeUrl(idx)}
+              />
+            )
+          )}
 
           {/* In-progress / failed pending thumbs */}
           {pending.map((thumb) => (
@@ -189,15 +215,26 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
               key={thumb.id}
               className="relative aspect-square overflow-hidden rounded-xl border border-border bg-muted"
             >
-              {/* Local blob preview — shown immediately without waiting for upload */}
-              <img
-                src={thumb.preview}
-                alt="Uploading…"
-                className={[
-                  "h-full w-full object-cover",
-                  thumb.error ? "opacity-30" : "opacity-60",
-                ].join(" ")}
-              />
+              {/* Local blob preview */}
+              {thumb.isVideo ? (
+                <video
+                  src={thumb.preview}
+                  className={[
+                    "h-full w-full object-cover",
+                    thumb.error ? "opacity-30" : "opacity-60",
+                  ].join(" ")}
+                  muted
+                />
+              ) : (
+                <img
+                  src={thumb.preview}
+                  alt="Uploading…"
+                  className={[
+                    "h-full w-full object-cover",
+                    thumb.error ? "opacity-30" : "opacity-60",
+                  ].join(" ")}
+                />
+              )}
               {/* Spinner / error overlay */}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1">
                 {thumb.error ? (
@@ -240,24 +277,31 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
             : "border-border bg-muted/30 hover:border-primary/60 hover:bg-primary/5",
         ].join(" ")}
       >
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-          <ImagePlus size={18} className="text-primary" />
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+            <ImagePlus size={18} className="text-primary" />
+          </div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+            <Film size={18} className="text-primary" />
+          </div>
         </div>
         <p className="text-xs font-semibold text-foreground">
           {dragging
-            ? "Drop images here"
+            ? "Drop files here"
             : hasThumbs
-              ? "+ Add More Images"
+              ? "+ Add More Photos or Videos"
               : "Drag & drop or click to browse"}
         </p>
-        <p className="text-[11px] text-muted-foreground">JPG, PNG, WebP — max 5 MB each</p>
+        <p className="text-[11px] text-muted-foreground">
+          Photos: JPG, PNG, WebP, HEIC — max 15 MB&nbsp;&nbsp;·&nbsp;&nbsp;Videos: MP4, MOV, WebM — max 20 MB
+        </p>
       </div>
 
-      {/* Hidden multi-file input */}
+      {/* Hidden multi-file input — accepts images (incl. HEIC) and video clips */}
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/jpg,image/png,image/webp"
+        accept="image/jpeg,image/jpg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif,video/mp4,video/quicktime,video/webm"
         multiple
         className="hidden"
         onChange={onFileChange}
@@ -269,9 +313,7 @@ export function GalleryUploader({ value, onChange, onUploadingChange }: GalleryU
 }
 
 /* ─────────────────────────────────────────────────────────────────── *
- * Sub-component: a single already-uploaded gallery thumbnail           *
- * Shows a skeleton while the remote image is loading, and a retry     *
- * error state if it fails — no more silent blank squares.             *
+ * Sub-component: already-uploaded IMAGE thumbnail                     *
  * ─────────────────────────────────────────────────────────────────── */
 interface UploadedThumbProps {
   src: string;
@@ -338,6 +380,45 @@ function UploadedThumb({ src, label, onRemove }: UploadedThumbProps) {
           <X size={12} />
         </button>
       )}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────── *
+ * Sub-component: already-uploaded VIDEO thumbnail                     *
+ * ─────────────────────────────────────────────────────────────────── */
+interface UploadedVideoThumbProps {
+  src: string;
+  label: string;
+  onRemove: () => void;
+}
+
+function UploadedVideoThumb({ src, label, onRemove }: UploadedVideoThumbProps) {
+  return (
+    <div className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
+      <video
+        src={src}
+        aria-label={label}
+        muted
+        loop
+        className="h-full w-full object-cover"
+        onMouseEnter={(e) => e.currentTarget.play()}
+        onMouseLeave={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }}
+      />
+      {/* Video badge */}
+      <div className="absolute bottom-1 left-1 flex items-center gap-0.5 rounded-md bg-black/70 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
+        <Film size={9} />
+        Video
+      </div>
+      {/* Remove button */}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-destructive/90 text-destructive-foreground opacity-0 shadow transition-opacity group-hover:opacity-100"
+        title="Remove video"
+      >
+        <X size={12} />
+      </button>
     </div>
   );
 }

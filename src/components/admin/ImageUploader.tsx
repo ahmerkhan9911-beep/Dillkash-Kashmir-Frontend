@@ -1,20 +1,29 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { ImageIcon, Loader2, Trash2, RefreshCw, Link, AlertCircle } from "lucide-react";
-import { uploadImage } from "@/services/api";
+import { uploadMedia } from "@/services/api";
 import { resolveImageUrl } from "@/lib/resolveImage";
 
 /* ─────────────────────────────────────────────────────────────────── *
- * Allowed types / size limit (mirrors server-side validation)         *
+ * Allowed image types / size limit                                     *
+ *                                                                      *
+ * Validation is extension-based (not MIME type) because HEIC files    *
+ * from iPhones often arrive as 'application/octet-stream' in some     *
+ * browsers — extension checking avoids false rejections.              *
  * ─────────────────────────────────────────────────────────────────── */
-const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const ALLOWED_IMAGE_EXTS = new Set(["jpg", "jpeg", "png", "webp", "gif", "heic", "heif"]);
+const MAX_BYTES = 15 * 1024 * 1024; // 15 MB (generous for HEIC raw files)
+
+function getExt(file: File): string {
+  return file.name.split(".").pop()?.toLowerCase() ?? "";
+}
 
 function validateFile(file: File): string | null {
-  if (!ALLOWED_TYPES.includes(file.type)) {
-    return "Only JPG, PNG, and WebP images are allowed.";
+  const ext = getExt(file);
+  if (!ALLOWED_IMAGE_EXTS.has(ext)) {
+    return `Unsupported file ".${ext}". Allowed: JPG, PNG, WebP, HEIC/HEIF.`;
   }
   if (file.size > MAX_BYTES) {
-    return "File must be smaller than 5 MB.";
+    return "File must be smaller than 15 MB.";
   }
   return null;
 }
@@ -87,7 +96,7 @@ export function ImageUploader({
       setUploadingState(true);
 
       try {
-        const uploadedUrl = await uploadImage(file);
+        const uploadedUrl = await uploadMedia(file);
         onChange(uploadedUrl);
         // Clear the temporary blob now that the parent has the real URL
         setLocalBlob(null);
@@ -243,7 +252,7 @@ export function ImageUploader({
         <input
           ref={inputRef}
           type="file"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
+        accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
           className="hidden"
           onChange={onFileChange}
         />
@@ -279,7 +288,7 @@ export function ImageUploader({
           <p className="text-sm font-semibold text-foreground">
             {dragging ? "Drop image here" : "Drag & drop or click to browse"}
           </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">JPG, PNG, WebP — max 5 MB</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">JPG, PNG, WebP, HEIC — max 15 MB</p>
         </div>
       </div>
 
